@@ -14,3 +14,5 @@ func main() {
   argument,_ = strconv.Atoi(os.Args[1]);
   fmt.Println(argument);
 };
+"boi"
+ola "abc123" -> abc12345 <- ignorado
