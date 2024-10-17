@@ -2,8 +2,6 @@ digit   [0-9]
 alga [a-zA-Z_]
 words "char"|"else"|"while"|"if"|"int"|"short"|"double"|"return"|"void"
 reserved "break"|"default"|"func"|"interface"|"select"|"case"|"defer"|"go"|"map"|"struct"|"chan"|"else"|"goto"|"package"|"switch"|"const"|"fallthrough"|"if"|"range"|"type"|"continue"|"for"|"import"|"return"|"var"
-cmdargs "fmt.Println"|"strconv.Atoi"|"os.Args"
-newline "\r?|\n"
 %x COMMENT
 %x SINGLECOMMENT
 %x SEMICOLON
@@ -31,14 +29,9 @@ newline "\r?|\n"
 <SINGLECOMMENT>.             { ; }
 <SINGLECOMMENT>(\n|\r\n)     { line += 1; column = 0; BEGIN(INITIAL); }
 
-<SEMICOLON>{newline}    { if(exist)printf("SEMICOLON\n"); line+=1; column = 0; }
-<SEMICOLON>.            { yyless(0); BEGIN(INITIAL);}
-<SEMICOLON><<EOF>>      { if(exist)printf("SEMICOLON\n"); yyterminate();}
-
 " "                     { column += 1; }
 \t                      { column += 4; }
 \n|\r\n|\r              { line+=1; column = 0; }
-
 
 ";" { if(exist)printf("SEMICOLON\n"); column += 1;}
 "&" { if(exist)printf("BITWISEAND\n"); column += 1;}
@@ -67,15 +60,16 @@ newline "\r?|\n"
 "[" { if(exist)printf("LSQ\n"); column += 1;}
 "]" { if(exist)printf("RSQ\n"); column += 1;}
 "_" { if(exist)printf("BLANKID\n"); column += 1;}
-
+"fmt.Println"   { if(exist)printf("PRINT\n"); column += 1;}
+"strconv.Atoi"  { if(exist)printf("PARSEINT\n"); column += 1;}
+"os.Args"       { if(exist)printf("CMDARGS\n"); column += 1;}
 
 {reserved}                                                                              { if(exist)for(int i=0;i<yyleng;i++)if(yytext[i] != '.')printf("%c", yytext[i]-32);printf("\n"); column += yyleng; }
-{cmdargs}                                                                               { if(exist)printf("CMDARGS\n"); column += 1;}
 {words}                                                                                 { if(exist)for(int i = 0; i < yyleng;i++) printf("%c",yytext[i]-32);printf("\n"); column += yyleng;}
 {digit}+                                                                                { if(exist)printf("NATURAL(%s)\n", yytext); column += yyleng;}
 [a-zA-Z_]+[a-zA-Z0-9_]*                                                                 { if(exist)printf("IDENTIFIER(%s)\n", yytext); column+= yyleng;}
 
-\"([^"\\\n]|\\[fnrt"\\])*\"                                                             { printf("STRLIT(%s)\n", yytext); column += yyleng; }
+\"([^"\\\n]|\\[fnrt"\\])*\"                                                             { printf("STRLIT(%s)\n", yytext);printf("SEMICOLON\n"); column += yyleng; }
 
 
 (({digit}"."{digit}?("E"|"e")("+"|"-")?{digit}?)|"."{digit}("E"|"e")("+"|"-")?{digit}?|({digit}("E"|"e")("+"|"-")?{digit})) { if(exist)printf("DECIMAL(%s)\n", yytext); column += yyleng;}
