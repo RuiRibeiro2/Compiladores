@@ -1,11 +1,12 @@
 digit   [0-9]
 alga [a-zA-Z_]
-pont2 "'\n'"|"'\t'"|"'\\'"|"'\''"|"'\'"
 words "char"|"else"|"while"|"if"|"int"|"short"|"double"|"return"|"void"
 reserved "break"|"default"|"func"|"interface"|"select"|"case"|"defer"|"go"|"map"|"struct"|"chan"|"else"|"goto"|"package"|"switch"|"const"|"fallthrough"|"if"|"range"|"type"|"continue"|"for"|"import"|"return"|"var"
 cmdargs "fmt.Println"|"strconv.Atoi"|"os.Args"
+newline "\r?|\n"
 %x COMMENT
 %x SINGLECOMMENT
+%x SEMICOLON
 %{
     /*Rui Miguel Fonte Ribeiro 2021189478
     Francisco Nunes Simões Rodrigues 2021237081*/
@@ -21,19 +22,25 @@ cmdargs "fmt.Println"|"strconv.Atoi"|"os.Args"
 
 %}
 %%
-"/*"                    { BEGIN(COMMENT); commentLine = line; commentColumn = column-1; commentState = 1;}
+"/*"                    { BEGIN(COMMENT); commentLine = line; commentColumn = column-1; commentState = 1; }
 <COMMENT>.              { ; }
 <COMMENT>(\n|\r\n)      { line+=1; column = 0; }
-<COMMENT>"*/"           { commentState = 0; BEGIN(INITIAL);}
+<COMMENT>"*/"           { commentState = 0; BEGIN(INITIAL); }
 
-\/\/                         { BEGIN(SINGLECOMMENT);}
+\/\/                         { BEGIN(SINGLECOMMENT); }
 <SINGLECOMMENT>.             { ; }
-<SINGLECOMMENT>(\n|\r\n)     { line += 1; column = 0; BEGIN(INITIAL);}
+<SINGLECOMMENT>(\n|\r\n)     { line += 1; column = 0; BEGIN(INITIAL); }
 
-" "                     { column += 1;}
-\t                      { column += 4;}
-\n|\r\n|\r              { line+=1; column = 0;}
+<SEMICOLON>{newline}    { if(exist)printf("SEMICOLON\n"); line+=1; column = 0; }
+<SEMICOLON>.            { yyless(0); BEGIN(INITIAL);}
+<SEMICOLON><<EOF>>      { if(exist)printf("SEMICOLON\n"); yyterminate();}
 
+" "                     { column += 1; }
+\t                      { column += 4; }
+\n|\r\n|\r              { line+=1; column = 0; }
+
+
+";" { if(exist)printf("SEMICOLON\n"); column += 1;}
 "&" { if(exist)printf("BITWISEAND\n"); column += 1;}
 "^" { if(exist)printf("BITWISEXOR\n"); column += 1;}
 "|" { if(exist)printf("BITWISEOR\n"); column += 1;}
@@ -56,13 +63,10 @@ cmdargs "fmt.Println"|"strconv.Atoi"|"os.Args"
 "!" { if(exist)printf("NOT\n"); column += 1;}
 "||" { if(exist)printf("OR\n"); column += 2;}
 "}" { if(exist)printf("RBRACE\n"); column += 1;}
-";" { if(exist)printf("SEMICOLON\n"); column += 1;}
 ")" { if(exist)printf("RPAR\n"); column += 1;}
 "[" { if(exist)printf("LSQ\n"); column += 1;}
 "]" { if(exist)printf("RSQ\n"); column += 1;}
 "_" { if(exist)printf("BLANKID\n"); column += 1;}
-
-
 
 
 {reserved}                                                                              { if(exist)for(int i=0;i<yyleng;i++)if(yytext[i] != '.')printf("%c", yytext[i]-32);printf("\n"); column += yyleng; }
@@ -71,7 +75,7 @@ cmdargs "fmt.Println"|"strconv.Atoi"|"os.Args"
 {digit}+                                                                                { if(exist)printf("NATURAL(%s)\n", yytext); column += yyleng;}
 [a-zA-Z_]+[a-zA-Z0-9_]*                                                                 { if(exist)printf("IDENTIFIER(%s)\n", yytext); column+= yyleng;}
 
-\"([^"\\\n]|\\[fnrt"\\])*\"  { printf("STRLIT(%s)\n", yytext); column += yyleng; }
+\"([^"\\\n]|\\[fnrt"\\])*\"                                                             { printf("STRLIT(%s)\n", yytext); column += yyleng; }
 
 
 (({digit}"."{digit}?("E"|"e")("+"|"-")?{digit}?)|"."{digit}("E"|"e")("+"|"-")?{digit}?|({digit}("E"|"e")("+"|"-")?{digit})) { if(exist)printf("DECIMAL(%s)\n", yytext); column += yyleng;}
