@@ -1,10 +1,10 @@
-digit   [0-9]
+digit [0-9]
 alga [a-zA-Z_]
 words "char"|"else"|"while"|"if"|"int"|"short"|"double"|"return"|"void"
 reserved "break"|"default"|"func"|"interface"|"select"|"case"|"defer"|"go"|"map"|"struct"|"chan"|"else"|"goto"|"package"|"switch"|"const"|"fallthrough"|"if"|"range"|"type"|"continue"|"for"|"import"|"return"|"var"
 %x COMMENT
 %x SINGLECOMMENT
-%x SEMICOLON
+
 %{
     /*Rui Miguel Fonte Ribeiro 2021189478
     Francisco Nunes Simões Rodrigues 2021237081*/
@@ -65,13 +65,10 @@ reserved "break"|"default"|"func"|"interface"|"select"|"case"|"defer"|"go"|"map"
 "os.Args"       { if(exist)printf("CMDARGS\n"); column += 1;}
 
 {reserved}                                                                              { if(exist)for(int i=0;i<yyleng;i++)if(yytext[i] != '.')printf("%c", yytext[i]-32);printf("\n"); column += yyleng; }
+\"([^"\\\n]|\\[fnrt"\\])*\"                                                             { printf("STRLIT(%s)\n", yytext);printf("SEMICOLON\n"); column += yyleng; }
 {words}                                                                                 { if(exist)for(int i = 0; i < yyleng;i++) printf("%c",yytext[i]-32);printf("\n"); column += yyleng;}
 {digit}+                                                                                { if(exist)printf("NATURAL(%s)\n", yytext); column += yyleng;}
 [a-zA-Z_]+[a-zA-Z0-9_]*                                                                 { if(exist)printf("IDENTIFIER(%s)\n", yytext); column+= yyleng;}
-
-\"([^"\\\n]|\\[fnrt"\\])*\"                                                             { printf("STRLIT(%s)\n", yytext);printf("SEMICOLON\n"); column += yyleng; }
-
-
 (({digit}"."{digit}?("E"|"e")("+"|"-")?{digit}?)|"."{digit}("E"|"e")("+"|"-")?{digit}?|({digit}("E"|"e")("+"|"-")?{digit})) { if(exist)printf("DECIMAL(%s)\n", yytext); column += yyleng;}
 .                                                                                       { printf("Line %d, column %d: unrecognized character (%s)\n",line,column,yytext); column += yyleng;} 
 
