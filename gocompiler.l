@@ -1,28 +1,3 @@
-%{
-    // Tomás Mendes - 2019232272
-    // Joel Oliveira - 2019227468
-
-    /*
-        REVER   :: blank                    ( B ) 5/5
-                :: ids_keywords             ( C ) 20/20
-                :: ops_brackets_punc_mars   ( D ) 10/10
-                :: text                     ( E ) 10/10
-                :: comments                 ( F ) 15/15
-                :: literals                 ( G ) 25/30 <<<<---------
-                :: illegalchar              ( H ) 20/20
-                :: comments_bad             ( I ) 10/10
-                :: str_bad                  ( J ) 0/20  <<<<---------
-                :: semicolons               ( K ) 25/25
-                :: programs                 ( L ) 25/25
-    */
-    int line = 1;
-    int comment_lines = 1; 
-    int col = 0;
-    int comment_cols = 0;
-
-    int flag_1, swaped_line;
-%}
-
 letter  [a-zA-Z_]
 number  [0-9]
 exp     (e|E)[-+]?{number}+
