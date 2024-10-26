@@ -1,3 +1,12 @@
+%{
+    //gocompiler_v1comv3
+    int line = 1;
+    int comment_lines = 1; 
+    int col = 0;
+    int comment_cols = 0;
+    int flag_1, swaped_line;
+%}
+
 letter  [a-zA-Z_]
 number  [0-9]
 exp     (e|E)[-+]?{number}+
@@ -72,16 +81,10 @@ whispace (" "|\t)
 "switch"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
 "type"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
 
-0[0-7]+                         {if (flag_1) fprintf(yyout, "NATURAL1(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
-0[0-7]+[0-9a-zA-Z]+             {if (flag_1) fprintf(yyout, "Line %d, column %d: invalid octal constant (%s)\n",line,++col, yytext); col+=yyleng-1; BEGIN SEMICOLON; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
-0[xX][0-9a-fA-F]+               {if (flag_1) fprintf(yyout, "NATURAL2(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes hexadecimais (0x ou 0X seguido por dígitos e letras a-f ou A-F)
-
-<OCTAL>0[0-7]*                             {if (flag_1) fprintf(yyout, "NATURAL5(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
-<OCTAL>[0-9]+                              {col++; fprintf(yyout, "Line %d, column %d: invalid octal constant (%s)\n", line, col, yytext); col+=yyleng-1; BEGIN 0;}
-<OCTAL>.                                   {yyless(0); BEGIN 0;}
-
-
-[0-9]+                          {if (flag_1) fprintf(yyout, "NATURAL3(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes decimais (sequência de dígitos 0-9)
+0[0-7]+                         {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
+0([0-7]*[8-9]+[0-7]*)+             {if (flag_1) fprintf(yyout, "Line %d, column %d: invalid octal constant (%s)\n",line,++col, yytext); col+=yyleng-1; BEGIN SEMICOLON; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
+0[xX][0-9a-fA-F]+               {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes hexadecimais (0x ou 0X seguido por dígitos e letras a-f ou A-F)
+[0-9]+                          {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes decimais (sequência de dígitos 0-9)
 ({float}{exp}?|{number}+{exp})  {if (flag_1) fprintf(yyout, "DECIMAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
 {letter}[a-zA-Z0-9_]*			{if (flag_1) fprintf(yyout, "IDENTIFIER(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
 \"                              {yyless(0); BEGIN STRING;}
@@ -136,7 +139,6 @@ int main(int argc, char *argv[]){
         //checkig for argument -l like this so we dont have to import string.h
         flag_1 = 1;
     }   
-
     yylex();
     return 0;
 }
