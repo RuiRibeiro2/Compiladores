@@ -14,12 +14,12 @@
     #include <string.h>
     #include <stdbool.h>
     int yyparse(void);
-    extern struct node *program;
+    extern struct node *program_root;
     int line = 1;
     int comment_lines = 1; 
     int col = 0;
     int comment_cols = 0;
-    int flag_1, swaped_line;
+    int flag_1,flag_2,flag_3,swaped_line;
     int i_semicolon = 0;
     int start_brace = 0;
     #define PASS_TOKEN() yylval.token = strdup(yytext); 
@@ -146,21 +146,24 @@ int main(int argc, char *argv[]){
         yylex();
     } 
     if (argv[1] != 0 && (argv[1][0] == '-' && argv[1][1] == 't')){
-        flag_1 = 1;
+        //flag para returns
+        //flag_2 = 1;    //CRIAR FLAG2 PARA OS RETURNS -> VER flag_return DA meta3_sb_v1
         yyparse();
+
+        //CRIAR FLAG3 PARA OS ERROS SINTATICOS -> VER flag_syntax_error DA meta3_sb_v1
+        //flag para erros de sintase
+        if(flag_3 == 0){  
+            printtree(program_root, 0);
+        }
     }  
-    //print_ast(program);
-
-    /*if (flag_1 == 1){
-        yylex();
-    }*/
+    
     return 0;
-
-    //free_ast(program);
 }
 
 void yyerror(const char *s) {
+    flag_3_syntax_error = 1;
     fprintf(stderr, "%s\n", s); // Apenas imprime a mensagem de erro
+    //printf ("Line %d, column %d: %s: %s\n", last_line_pos, last_col_pos, str, yytext);
 }
 
 int yywrap(){

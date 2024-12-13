@@ -9,9 +9,11 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "y.tab.h"
+
 extern int yylex(void);
 extern void yyerror(char *);
 extern char *yytext;
+
 node* program_root = NULL;
 node* aux;
 node* varspec_aux;
