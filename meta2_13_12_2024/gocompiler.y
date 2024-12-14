@@ -1,6 +1,6 @@
 %{
     /*
-    Projeto de Compiladores 2023/2024~
+    Projeto de Compiladores 2023/2024~yaacv2
     Meta 2
     2021189478 - Rui Ribeiro
     2021221169 - Francisco Rodrigues
@@ -332,10 +332,14 @@ Statement: IDENTIFIER ASSIGN Expr {
     $$ = newNode("Print", NULL);
     addchild($$, $3);
 }
-| PRINT LPAR STRLIT RPAR { $$ = newNode("Print", NULL); aux = newNode("StrLit", $3); addchild($$, aux);}
+| PRINT LPAR STRLIT RPAR { 
+    $$ = newNode("Print", NULL); 
+    aux = newNode("StrLit", $3); 
+    addchild($$, aux);}
 
 | error {
     $$ = newNode("Error", NULL);
+    freetree(program_root);         //ALTERACAO
 };
 
 // StatementList Rule
@@ -359,11 +363,13 @@ ParseArgs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RP
     aux = newNode("IDENTIFIER", $1);
     addchild($$, aux);
     addsiblings(aux, newNode("Error", NULL));
+    freetree(program_root);         //ALTERACAO
 };
 
 // Function Invocation Rule
-FuncID: IDENTIFIER                                                   {$$ = newNode("Id", $1);}
-        ;
+FuncID: IDENTIFIER
+    //{$$ = newNode("Id", $1);};
+    {$$ = newNode("IDENTIFIER", $1);};           //ALTERACAO
 
 FuncInvocation: FuncID LPAR RPAR { $$ = $1; }
 | FuncID LPAR Expr RPAR {
@@ -378,6 +384,7 @@ FuncInvocation: FuncID LPAR RPAR { $$ = $1; }
 | FuncID LPAR error RPAR {
     $$ = $1;
     addsiblings($1, newNode("Error", NULL));
+    freetree(program_root);         //ALTERACAO
 };
 
 // CommaExpressionList Rule
@@ -411,5 +418,6 @@ Expr:   Expr OR Expr {$$ = newNode("Or", NULL); addchild($$, $1); addsiblings($1
 | IDENTIFIER {$$ = newNode("IDENTIFIER", $1);}
 | FuncInvocation {$$ = newNode("Call", NULL); addchild($$, $1);}
 | LPAR Expr RPAR {$$ = $2;}
-| LPAR error RPAR {$$ = newNode("Error", NULL);};
+| LPAR error RPAR {$$ = newNode("Error", NULL);freetree(program_root);} //ALTERACAO
+;
 %% 
