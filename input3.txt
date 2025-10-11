@@ -1,6 +1,0 @@
-factorial(integer n) =
-if n then n * factorial(n-1) # else 1 /* recursive factorial
-*/ #
-#
-ola
-12345789 12345657879 qewefsdrgftgyhuj
