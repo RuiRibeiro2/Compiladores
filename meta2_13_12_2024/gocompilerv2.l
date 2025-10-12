@@ -19,10 +19,7 @@
     int comment_lines = 1; 
     int col = 0;
     int comment_cols = 0;
-    int flag_1 = 0, flag_2 = 0, swaped_line;
-    int flag_3 = 0;  // flag para erros sintáticos
-    int syntax_error_line = 1;
-    int syntax_error_column = 1;
+    int flag_1,flag_2,flag_3,swaped_line;
     int i_semicolon = 0;
     int start_brace = 0;
     #define PASS_TOKEN() yylval.token = strdup(yytext); 
@@ -40,14 +37,9 @@ sp_chr      \\(\"|n|r|t|f|\\)
 whispace    (" "|\t)
 reservedWords "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defer"|"fallthrough"|"go"|"import"|"goto"|"interface"|"map"|"range"|"select"|"struct"|"switch"|"type"
 
-%X SEMICOLON BCOMMENT LCOMMENT STRING DUMMY_QUOTE SEMIBCOMMENT SEMILCOMMENT INVALID_STRING
+%X SEMICOLON2 BCOMMENT LCOMMENT STRING2 DUMMY_QUOTE SEMIBCOMMENT SEMILCOMMENT INVALID_STRING
 
 %%
-<*>.|\n    { 
-    printf("DEBUG STATE: state=%d, char='%c' (%d)\n", 
-           YY_START, *yytext, *yytext); 
-    REJECT; 
-}
 
 ";"				{if (flag_1) if(i_semicolon==0){fprintf(yyout, "SEMICOLON\n");}if(i_semicolon==1){fprintf(yyout, "SEMICOLON\n");i_semicolon=0;} col+=yyleng; yylval.value = (char*) strdup(yytext); return SEMICOLON;}
 ","				{if (flag_1) fprintf(yyout, "COMMA\n"); col+=yyleng; i_semicolon=0; yylval.value = (char*) strdup(yytext); return COMMA;}
@@ -95,7 +87,7 @@ reservedWords "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defe
 {natural}                       {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; yylval.value = (char*) strdup(yytext); i_semicolon=1; }    // NATURAL: Todos os naturais
 ({float}{exp}?|{number}+{exp})  {if (flag_1) fprintf(yyout, "DECIMAL(%s)\n", yytext); col+=yyleng; yylval.value = (char*) strdup(yytext); i_semicolon=1;}
 {letter}[a-zA-Z0-9_]*			{if (flag_1) fprintf(yyout, "IDENTIFIER(%s)\n", yytext); col+=yyleng; yylval.value = (char*) strdup(yytext); i_semicolon=1;}
-\"                              {yyless(0); BEGIN STRING;}  
+\"                              {yyless(0); BEGIN STRING2;}  
 
 
 <BCOMMENT>"*/" 	        				  {line+=comment_lines; if (swaped_line) col = 0; else col++; col+=comment_cols+yyleng; BEGIN 0;}
@@ -106,28 +98,28 @@ reservedWords "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defe
 <LCOMMENT>{newline} 	        		  {if(flag_1 && i_semicolon==1) fprintf(yyout, "SEMICOLON\n");i_semicolon=0;line++; col = 0; BEGIN 0;}
 <LCOMMENT>. 	        				  {;}
 
-<SEMICOLON>{newline}                      {if (flag_1) fprintf(yyout, "SEMICOLON\n");line++; col = 0; BEGIN 0;}
-<SEMICOLON>{whispace}	                  {col+=yyleng;}
-<SEMICOLON>"/*"                           {col++; comment_lines = 0; comment_cols = 0; swaped_line = 0; BEGIN SEMIBCOMMENT;}
-<SEMICOLON>"//"                           {BEGIN SEMILCOMMENT;}
-<SEMICOLON>.                              {yyless(0); BEGIN 0;}
-<SEMICOLON><<EOF>>                        {if (flag_1) fprintf(yyout, "SEMICOLON\n"); yyterminate();}
+<SEMICOLON2>{newline}                      {if (flag_1) fprintf(yyout, "SEMICOLON\n");line++; col = 0; BEGIN 0;}
+<SEMICOLON2>{whispace}	                  {col+=yyleng;}
+<SEMICOLON2>"/*"                           {col++; comment_lines = 0; comment_cols = 0; swaped_line = 0; BEGIN SEMIBCOMMENT;}
+<SEMICOLON2>"//"                           {BEGIN SEMILCOMMENT;}
+<SEMICOLON2>.                              {yyless(0); BEGIN 0;}
+<SEMICOLON2><<EOF>>                        {if (flag_1) fprintf(yyout, "SEMICOLON\n"); yyterminate();}
 
 
 
-<SEMIBCOMMENT>"*/" 	        				  {line+=comment_lines; if (swaped_line) col = 0; else col++; col+=comment_cols+yyleng; if (swaped_line) {fprintf(yyout, "SEMICOLON\n"); BEGIN 0;} else BEGIN SEMICOLON;}
+<SEMIBCOMMENT>"*/" 	        				  {line+=comment_lines; if (swaped_line) col = 0; else col++; col+=comment_cols+yyleng; if (swaped_line) {fprintf(yyout, "SEMICOLON\n"); BEGIN 0;} else BEGIN SEMICOLON2;}
 <SEMIBCOMMENT>{newline}        	              {comment_lines++; comment_cols = 0; swaped_line=1; }
 <SEMIBCOMMENT><<EOF>>                         {fprintf(yyout, "SEMICOLON\n"); fprintf(yyout, "Line %d, column %d: unterminated comment\n", line, col); yyterminate();}
 <SEMIBCOMMENT>.     	        	          {comment_cols+=yyleng;}
 
-<SEMILCOMMENT>{newline} 	        		  {yyless(0); BEGIN SEMICOLON;}
+<SEMILCOMMENT>{newline} 	        		  {yyless(0); BEGIN SEMICOLON2;}
 <SEMILCOMMENT><<EOF>>                         {fprintf(yyout, "SEMICOLON\n"); yyterminate();}
 <SEMILCOMMENT>. 	        				  {;}
 
-<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
-<STRING>\"(\\(\"|n|r|t|f|\\)|[^\\\"\r\n])*\"                    {if (flag_1) fprintf(yyout, "STRLIT(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
-<STRING>\"[^\"\r\n]*\\[^\\\"nrtf][^\"\r\n]*\"                   {yyless(0); BEGIN DUMMY_QUOTE;}
-<STRING>\"[^\"\r\n]*{newline}?                                  {yyless(0); BEGIN DUMMY_QUOTE;}
+<STRING2>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
+<STRING2>\"(\\(\"|n|r|t|f|\\)|[^\\\"\r\n])*\"                    {if (flag_1) fprintf(yyout, "STRLIT(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON2;}
+<STRING2>\"[^\"\r\n]*\\[^\\\"nrtf][^\"\r\n]*\"                   {yyless(0); BEGIN DUMMY_QUOTE;}
+<STRING2>\"[^\"\r\n]*{newline}?                                  {yyless(0); BEGIN DUMMY_QUOTE;}
 
 
 <DUMMY_QUOTE>\"                             {col++; comment_cols = 1; BEGIN INVALID_STRING;}
@@ -141,12 +133,12 @@ reservedWords "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defe
 
 
 {newline}				    			  {line++; col = 0;if(i_semicolon == 1 && start_brace == 0)fprintf(yyout, "SEMICOLON\n"); yylval.value = (char*) strdup(yytext); i_semicolon=0;start_brace=0;BEGIN 0;}
-{whispace}                                { ; col+=yyleng; }
+{whispace}                                {col+=yyleng;}
 .				        				  {col+=1; fprintf(yyout, "Line %d, column %d: illegal character (%s)\n", line, col, yytext);col+=yyleng-1;int next_char = input();if (next_char != EOF) {unput(next_char);}}
 
 <<EOF>>                                     { if (i_semicolon == 1) if (flag_1) fprintf(yyout, "SEMICOLON\n");return 0;}
 %%
-/*
+
 int main(int argc, char *argv[]){
     if (argv[1] != 0 && (argv[1][0] == '-' && argv[1][1] == 'l')){
         //checkig for argument -l like this so we dont have to import string.h
@@ -167,43 +159,11 @@ int main(int argc, char *argv[]){
     
     return 0;
 }
-*/
-int main(int argc, char *argv[]){
-    yyout = stdout;  // DEBUG: output to standard output
-    if (argc > 1) {
-        if (strcmp(argv[1], "-l") == 0) {
-            // Análise léxica apenas
-            printf("Initial state: %d\n", YY_START);
-            flag_1 = 1;
-            yylex();
-        } else if (strcmp(argv[1], "-t") == 0) {
-            // Análise sintática + AST
-            flag_1 = 1;
-            yyparse();
-            if(flag_3 == 0){  
-                printtree(program_root, 0);
-            }
-        } else {
-            // Sem opção - apenas análise com mensagens de erro
-            yyparse();
-        }
-    } else {
-        // Sem argumentos - apenas análise com mensagens de erro
-        yyparse();
-    }
-    
-    return 0;
-}
 
-/*void yyerror(const char *s) {
+void yyerror(const char *s) {
     flag_3_syntax_error = 1;
     fprintf(stderr, "%s\n", s); // Apenas imprime a mensagem de erro
     //printf ("Line %d, column %d: %s: %s\n", last_line_pos, last_col_pos, str, yytext);
-}*/
-
-void yyerror(const char *s) {
-    flag_3 = 1;
-    printf("Line %d, column %d: syntax error: %s\n", syntax_error_line, syntax_error_column, yytext);
 }
 
 int yywrap(){

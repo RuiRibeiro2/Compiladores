@@ -36,7 +36,7 @@ folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # path para o executavel 'gocompiler'
 bin="../gocompiler"
 # meta a testar, testa todas por omissao
-meta="2"
+meta=""
 
 # parse dos argumentos
 # https://devhints.io/bash

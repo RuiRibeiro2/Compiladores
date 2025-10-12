@@ -1,0 +1,12 @@
+package main;
+func main() {
+    a,_ = strconv.Atoi(os.Args[4]);         // valid
+    a,_ = strconv.Atoi(os.Args[A]);
+    a,_ = strconv.Atoi(os.Args[A()]);
+
+    a,_ = strconv.Atoi(fmt.Println(05));    // invalid
+    a,_ = strconv.Atoi(os.Args["OS"]);
+    a,_ = strconv.Atoi(os.Args(OS));
+    a,_ = strconv.Atoi(os.Args);
+    a = f(true, 0, 2e-2, id, id(id), strconv.Atoi(os.Args[0]));
+}
