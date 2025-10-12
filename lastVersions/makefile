@@ -1,8 +1,8 @@
 LEX=flex
 CC=gcc
-LEX_SRC=gocompiler184.l
+LEX_SRC=gocompiler184v1.l
 LEX_OUT=lex.yy.c
-TARGET=gocompiler184
+TARGET=gocompiler184v1
 
 all: $(TARGET)
 

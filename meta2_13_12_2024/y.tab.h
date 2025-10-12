@@ -54,48 +54,48 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    SEMICOLON = 258,               /* SEMICOLON  */
-    STRING = 259,                  /* STRING  */
-    COMMA = 260,                   /* COMMA  */
-    BLANKID = 261,                 /* BLANKID  */
-    ASSIGN = 262,                  /* ASSIGN  */
-    STAR = 263,                    /* STAR  */
-    DIV = 264,                     /* DIV  */
-    MINUS = 265,                   /* MINUS  */
-    PLUS = 266,                    /* PLUS  */
-    EQ = 267,                      /* EQ  */
-    GE = 268,                      /* GE  */
-    GT = 269,                      /* GT  */
-    LE = 270,                      /* LE  */
-    LT = 271,                      /* LT  */
-    MOD = 272,                     /* MOD  */
-    NE = 273,                      /* NE  */
-    NOT = 274,                     /* NOT  */
-    AND = 275,                     /* AND  */
-    OR = 276,                      /* OR  */
-    LBRACE = 277,                  /* LBRACE  */
-    RBRACE = 278,                  /* RBRACE  */
-    LPAR = 279,                    /* LPAR  */
-    RPAR = 280,                    /* RPAR  */
-    LSQ = 281,                     /* LSQ  */
-    RSQ = 282,                     /* RSQ  */
-    PACKAGE = 283,                 /* PACKAGE  */
-    RETURN = 284,                  /* RETURN  */
-    PRINT = 285,                   /* PRINT  */
-    PARSEINT = 286,                /* PARSEINT  */
-    FUNC = 287,                    /* FUNC  */
-    CMDARGS = 288,                 /* CMDARGS  */
-    VAR = 289,                     /* VAR  */
-    IF = 290,                      /* IF  */
-    ELSE = 291,                    /* ELSE  */
-    FOR = 292,                     /* FOR  */
-    INT = 293,                     /* INT  */
-    FLOAT32 = 294,                 /* FLOAT32  */
-    BOOL = 295,                    /* BOOL  */
-    IDENTIFIER = 296,              /* IDENTIFIER  */
-    NATURAL = 297,                 /* NATURAL  */
-    DECIMAL = 298,                 /* DECIMAL  */
-    STRLIT = 299                   /* STRLIT  */
+    IDENTIFIER = 258,              /* IDENTIFIER  */
+    NATURAL = 259,                 /* NATURAL  */
+    DECIMAL = 260,                 /* DECIMAL  */
+    STRLIT = 261,                  /* STRLIT  */
+    SEMICOLON = 262,               /* SEMICOLON  */
+    COMMA = 263,                   /* COMMA  */
+    BLANKID = 264,                 /* BLANKID  */
+    PACKAGE = 265,                 /* PACKAGE  */
+    FUNC = 266,                    /* FUNC  */
+    VAR = 267,                     /* VAR  */
+    INT = 268,                     /* INT  */
+    FLOAT32 = 269,                 /* FLOAT32  */
+    BOOL = 270,                    /* BOOL  */
+    STRING = 271,                  /* STRING  */
+    IF = 272,                      /* IF  */
+    ELSE = 273,                    /* ELSE  */
+    FOR = 274,                     /* FOR  */
+    RETURN = 275,                  /* RETURN  */
+    PRINT = 276,                   /* PRINT  */
+    PARSEINT = 277,                /* PARSEINT  */
+    CMDARGS = 278,                 /* CMDARGS  */
+    ASSIGN = 279,                  /* ASSIGN  */
+    OR = 280,                      /* OR  */
+    AND = 281,                     /* AND  */
+    EQ = 282,                      /* EQ  */
+    NE = 283,                      /* NE  */
+    LT = 284,                      /* LT  */
+    LE = 285,                      /* LE  */
+    GT = 286,                      /* GT  */
+    GE = 287,                      /* GE  */
+    PLUS = 288,                    /* PLUS  */
+    MINUS = 289,                   /* MINUS  */
+    STAR = 290,                    /* STAR  */
+    DIV = 291,                     /* DIV  */
+    MOD = 292,                     /* MOD  */
+    NOT = 293,                     /* NOT  */
+    LBRACE = 294,                  /* LBRACE  */
+    RBRACE = 295,                  /* RBRACE  */
+    LPAR = 296,                    /* LPAR  */
+    RPAR = 297,                    /* RPAR  */
+    LSQ = 298,                     /* LSQ  */
+    RSQ = 299                      /* RSQ  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -104,57 +104,57 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define SEMICOLON 258
-#define STRING 259
-#define COMMA 260
-#define BLANKID 261
-#define ASSIGN 262
-#define STAR 263
-#define DIV 264
-#define MINUS 265
-#define PLUS 266
-#define EQ 267
-#define GE 268
-#define GT 269
-#define LE 270
-#define LT 271
-#define MOD 272
-#define NE 273
-#define NOT 274
-#define AND 275
-#define OR 276
-#define LBRACE 277
-#define RBRACE 278
-#define LPAR 279
-#define RPAR 280
-#define LSQ 281
-#define RSQ 282
-#define PACKAGE 283
-#define RETURN 284
-#define PRINT 285
-#define PARSEINT 286
-#define FUNC 287
-#define CMDARGS 288
-#define VAR 289
-#define IF 290
-#define ELSE 291
-#define FOR 292
-#define INT 293
-#define FLOAT32 294
-#define BOOL 295
-#define IDENTIFIER 296
-#define NATURAL 297
-#define DECIMAL 298
-#define STRLIT 299
+#define IDENTIFIER 258
+#define NATURAL 259
+#define DECIMAL 260
+#define STRLIT 261
+#define SEMICOLON 262
+#define COMMA 263
+#define BLANKID 264
+#define PACKAGE 265
+#define FUNC 266
+#define VAR 267
+#define INT 268
+#define FLOAT32 269
+#define BOOL 270
+#define STRING 271
+#define IF 272
+#define ELSE 273
+#define FOR 274
+#define RETURN 275
+#define PRINT 276
+#define PARSEINT 277
+#define CMDARGS 278
+#define ASSIGN 279
+#define OR 280
+#define AND 281
+#define EQ 282
+#define NE 283
+#define LT 284
+#define LE 285
+#define GT 286
+#define GE 287
+#define PLUS 288
+#define MINUS 289
+#define STAR 290
+#define DIV 291
+#define MOD 292
+#define NOT 293
+#define LBRACE 294
+#define RBRACE 295
+#define LPAR 296
+#define RPAR 297
+#define LSQ 298
+#define RSQ 299
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 25 "gocompiler.y"
+#line 33 "gocompiler.y"
 
-    char* value;
-    struct node* node;   
+    char* token_value;      // Valores de tokens (identificadores, literais, etc)
+    struct node* ast_node;  // Nós da árvore sintática abstrata
 
 #line 160 "y.tab.h"
 

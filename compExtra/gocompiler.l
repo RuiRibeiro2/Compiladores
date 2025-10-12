@@ -43,11 +43,6 @@ reservedWords "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defe
 %X SEMICOLON BCOMMENT LCOMMENT STRING DUMMY_QUOTE SEMIBCOMMENT SEMILCOMMENT INVALID_STRING
 
 %%
-<*>.|\n    { 
-    printf("DEBUG STATE: state=%d, char='%c' (%d)\n", 
-           YY_START, *yytext, *yytext); 
-    REJECT; 
-}
 
 ";"				{if (flag_1) if(i_semicolon==0){fprintf(yyout, "SEMICOLON\n");}if(i_semicolon==1){fprintf(yyout, "SEMICOLON\n");i_semicolon=0;} col+=yyleng; yylval.value = (char*) strdup(yytext); return SEMICOLON;}
 ","				{if (flag_1) fprintf(yyout, "COMMA\n"); col+=yyleng; i_semicolon=0; yylval.value = (char*) strdup(yytext); return COMMA;}
@@ -124,15 +119,15 @@ reservedWords "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defe
 <SEMILCOMMENT><<EOF>>                         {fprintf(yyout, "SEMICOLON\n"); yyterminate();}
 <SEMILCOMMENT>. 	        				  {;}
 
-<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
+<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; i_semicolon = 0; BEGIN 0;}
 <STRING>\"(\\(\"|n|r|t|f|\\)|[^\\\"\r\n])*\"                    {if (flag_1) fprintf(yyout, "STRLIT(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
 <STRING>\"[^\"\r\n]*\\[^\\\"nrtf][^\"\r\n]*\"                   {yyless(0); BEGIN DUMMY_QUOTE;}
 <STRING>\"[^\"\r\n]*{newline}?                                  {yyless(0); BEGIN DUMMY_QUOTE;}
 
 
-<DUMMY_QUOTE>\"                             {col++; comment_cols = 1; BEGIN INVALID_STRING;}
+<DUMMY_QUOTE>\"                             {col++; comment_cols = 1; i_semicolon = 0; BEGIN INVALID_STRING;} // ← CORREÇÃO: não ativar semicolon para strings inválidas
 <INVALID_STRING>\"                          {col+=comment_cols; BEGIN 0;}
-<INVALID_STRING>{newline}                   {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
+<INVALID_STRING>{newline}                   {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; i_semicolon = 0; BEGIN 0;} // ← CORREÇÃO: resetar flag
 <INVALID_STRING>\\(\"|n|r|t|f|\\)           {comment_cols+=yyleng;}
 <INVALID_STRING>\\[^\\\"nrtf\r\n]           {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
 <INVALID_STRING>\\                          {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
@@ -172,8 +167,7 @@ int main(int argc, char *argv[]){
     yyout = stdout;  // DEBUG: output to standard output
     if (argc > 1) {
         if (strcmp(argv[1], "-l") == 0) {
-            // Análise léxica apenas
-            printf("Initial state: %d\n", YY_START);
+            // Apenas análise léxica com tokens
             flag_1 = 1;
             yylex();
         } else if (strcmp(argv[1], "-t") == 0) {

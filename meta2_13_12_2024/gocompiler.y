@@ -14,6 +14,14 @@ extern int yylex(void);
 extern void yyerror(char *);
 extern char *yytext;
 
+// Estrutura para tracking de posição no código fonte
+#define TRACK_POSITION(node, l, c) do { \
+    if (node) { \
+        node->line = l; \
+        node->col = c; \
+    } \
+} while(0)
+
 node* program_root = NULL;
 node* aux;
 node* varspec_aux;
@@ -23,46 +31,57 @@ node* aux2 = NULL;
 %}
 
 %union {
-    char* value;
-    struct node* node;   
+    char* token_value;      // Valores de tokens (identificadores, literais, etc)
+    struct node* ast_node;  // Nós da árvore sintática abstrata
 };
 
-// Yacc tokens 
-%token SEMICOLON
-%token STRING 
-%token COMMA 
-%token BLANKID
-%token ASSIGN STAR DIV MINUS PLUS 
-%token EQ GE GT LE LT MOD NE
-%token NOT AND OR
-%token LBRACE RBRACE LPAR RPAR LSQ RSQ 
-%token PACKAGE
-%token RETURN PRINT PARSEINT FUNC CMDARGS VAR
-%token IF ELSE FOR
-%token INT FLOAT32 BOOL  
+// Tokens com valor semântico
+%token <token_value> IDENTIFIER  // Identificadores
+%token <token_value> NATURAL    // Números naturais
+%token <token_value> DECIMAL    // Números decimais
+%token <token_value> STRLIT     // Literais string
 
-%token <value> IDENTIFIER
-%token <value> NATURAL DECIMAL
-%token <value> STRLIT
+// Tokens sem valor semântico (ordenados por categoria)
+%token SEMICOLON COMMA BLANKID   // Pontuação
+%token PACKAGE FUNC VAR          // Palavras-chave de declaração
+%token INT FLOAT32 BOOL STRING   // Tipos
+%token IF ELSE FOR RETURN        // Controle de fluxo
+%token PRINT PARSEINT CMDARGS    // Built-ins
 
-%type <node> Program Declarations Declarations2
-%type <node> VarDeclaration Parameters ParametersList
-%type <node> VarSpec VarSpecList Type FuncDeclaration 
-%type <node> FuncBody VarsAndStatements
-%type <node> Statement StatementList ParseArgs
-%type <node> CommaExpressionList Expr
-%type <node> FuncInvocation FuncID
+// Operadores (ordenados por precedência)
+%token ASSIGN                    // Atribuição
+%token OR AND                    // Lógicos
+%token EQ NE LT LE GT GE        // Comparação
+%token PLUS MINUS               // Aritméticos nível 1
+%token STAR DIV MOD             // Aritméticos nível 2
+%token NOT                      // Unário
+%token LBRACE RBRACE           // Delimitadores
+%token LPAR RPAR LSQ RSQ
+
+// Não-terminais da AST
+%type <ast_node> Program 
+%type <ast_node> Declarations Declarations2
+%type <ast_node> VarDeclaration VarSpec VarSpecList
+%type <ast_node> Type
+%type <ast_node> FuncDeclaration FuncBody Parameters ParametersList
+%type <ast_node> VarsAndStatements
+%type <ast_node> Statement StatementList
+%type <ast_node> ParseArgs
+%type <ast_node> Expr CommaExpressionList
+%type <ast_node> FuncInvocation FuncID
 
 // Precedence and associativity
-%left COMMA
-%right ASSIGN
-%left OR 
-%left AND
-%left LT LE GT GE EQ NE
-%left PLUS MINUS
-%left STAR DIV MOD
-%right NOT
-%left LPAR RPAR LSQ RSQ
+// Precedência e associatividade (do mais baixo para o mais alto)
+%nonassoc IF ELSE    // Resolve conflito shift/reduce no if-else
+%left COMMA          // Separador de expressões
+%right ASSIGN        // Atribuição é associativa à direita
+%left OR             // Operador OR lógico
+%left AND            // Operador AND lógico
+%left LT LE GT GE EQ NE  // Operadores de comparação
+%left PLUS MINUS     // Adição e subtração
+%left STAR DIV MOD   // Multiplicação, divisão e módulo
+%right NOT           // Negação lógica e unários
+%nonassoc LPAR RPAR LSQ RSQ  // Parênteses e colchetes
 
 %%
 
