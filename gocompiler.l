@@ -1,112 +1,141 @@
 %{
-    //gocompiler_v1comv3
+    //gocompiler_v4 teste de substituicao dos comments - resultado correu bem apenas 0 erros agora - corrigido tirar i_semi dos comentarios
     int line = 1;
     int comment_lines = 1; 
     int col = 0;
     int comment_cols = 0;
     int flag_1, swaped_line;
+    int i_semicolon = 0;
+    int start_brace = 0;
+
+
+    #include <ctype.h>
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdlib.h>
+
+    #include "ast.h"
+
+    int yyparse(void);
+
+
+    /* Variáveis externas */
+    extern int yylex(void);
+    extern int yylineno;
+    extern char *yytext;
+    extern int line, column;
+    extern struct node *root;
+
+
+    /* 👇 Corrige o aviso de yyparse */
+    int yyparse(void);
+
+    /* Flag para controlar o modo de operação (-l ou -t) */
+    char flag = 0;
 %}
+
+
 
 letter  [a-zA-Z_]
 number  [0-9]
 exp     (e|E)[-+]?{number}+
 float   ({number}+"."{number}*)|("."{number}+)
 hexa	(0(x|X)[0-9a-fA-F]+)
-newline \r?\n
+newline \n|(\r\n)
 sp_chr  \\(\"|n|r|t|f|\\)
 whispace (" "|\t)
 
-%X SEMICOLON BCOMMENT LCOMMENT STRING DUMMY_QUOTE OCTAL SEMIBCOMMENT SEMILCOMMENT INVALID_STRING
+%X SEMICOLON BCOMMENT LCOMMENT STRING DUMMY_QUOTE OCTAL SEMIBCOMMENT SEMILCOMMENT INVALID_STRING SEMICOLON2
 
 %%
 
-";"				{if (flag_1) fprintf(yyout, "SEMICOLON\n"); col+=yyleng;}
-","				{if (flag_1) fprintf(yyout, "COMMA\n"); col+=yyleng;}
-"_"				{if (flag_1) fprintf(yyout, "BLANKID\n"); col+=yyleng;}
-"="				{if (flag_1) fprintf(yyout, "ASSIGN\n"); col+=yyleng;}
-"*"				{if (flag_1) fprintf(yyout, "STAR\n"); col+=yyleng;}
-"/"				{if (flag_1) fprintf(yyout, "DIV\n"); col+=yyleng;}
-"-"				{if (flag_1) fprintf(yyout, "MINUS\n"); col+=yyleng;}
-"+"				{if (flag_1) fprintf(yyout, "PLUS\n"); col+=yyleng;}
-"=="			{if (flag_1) fprintf(yyout, "EQ\n"); col+=yyleng;}
-">="			{if (flag_1) fprintf(yyout, "GE\n"); col+=yyleng;}
-">"				{if (flag_1) fprintf(yyout, "GT\n"); col+=yyleng;}
-"{"				{if (flag_1) fprintf(yyout, "LBRACE\n"); col+=yyleng;}
-"<="			{if (flag_1) fprintf(yyout, "LE\n"); col+=yyleng;}
-"("				{if (flag_1) fprintf(yyout, "LPAR\n"); col+=yyleng;}
-"["				{if (flag_1) fprintf(yyout, "LSQ\n"); col+=yyleng;}	
-"<"				{if (flag_1) fprintf(yyout, "LT\n"); col+=yyleng;}
-"%"				{if (flag_1) fprintf(yyout, "MOD\n"); col+=yyleng;}
-"!="			{if (flag_1) fprintf(yyout, "NE\n"); col+=yyleng;}
-"!"				{if (flag_1) fprintf(yyout, "NOT\n"); col+=yyleng;}
-"&&"			{if (flag_1) fprintf(yyout, "AND\n"); col+=yyleng;}
-"||"			{if (flag_1) fprintf(yyout, "OR\n"); col+=yyleng;}
-"}"				{if (flag_1) fprintf(yyout, "RBRACE\n"); col+=yyleng; BEGIN SEMICOLON;}
-")"				{if (flag_1) fprintf(yyout, "RPAR\n"); col+=yyleng; BEGIN SEMICOLON;}
-"]"				{if (flag_1) fprintf(yyout, "RSQ\n"); col+=yyleng; BEGIN SEMICOLON;}
-"package"		{if (flag_1) fprintf(yyout, "PACKAGE\n"); col+=yyleng;}
-"return"		{if (flag_1) fprintf(yyout, "RETURN\n"); col+=yyleng; BEGIN SEMICOLON;}
-"else"			{if (flag_1) fprintf(yyout, "ELSE\n"); col+=yyleng;}
-"for"			{if (flag_1) fprintf(yyout, "FOR\n"); col+=yyleng;}
-"if"			{if (flag_1) fprintf(yyout, "IF\n"); col+=yyleng;}
-"var"			{if (flag_1) fprintf(yyout, "VAR\n"); col+=yyleng;}
-"int"			{if (flag_1) fprintf(yyout, "INT\n"); col+=yyleng;}
-"float32"		{if (flag_1) fprintf(yyout, "FLOAT32\n"); col+=yyleng;}
-"bool"			{if (flag_1) fprintf(yyout, "BOOL\n"); col+=yyleng;}
-"string"		{if (flag_1) fprintf(yyout, "STRING\n"); col+=yyleng;}
-"fmt.Println"	{if (flag_1) fprintf(yyout, "PRINT\n"); col+=yyleng;}
-"strconv.Atoi"	{if (flag_1) fprintf(yyout, "PARSEINT\n"); col+=yyleng;}
-"func"			{if (flag_1) fprintf(yyout, "FUNC\n"); col+=yyleng;}
-"os.Args"		{if (flag_1) fprintf(yyout, "CMDARGS\n"); col+=yyleng;}
+";"				{if (flag_1) if(i_semicolon==0){fprintf(yyout, "SEMICOLON\n");}if(i_semicolon==1){fprintf(yyout, "SEMICOLON\n");i_semicolon=0;} col+=yyleng; }
+","				{if (flag_1) fprintf(yyout, "COMMA\n"); col+=yyleng; i_semicolon=0;}
+"_"				{if (flag_1) fprintf(yyout, "BLANKID\n"); col+=yyleng; i_semicolon=0;}
+"="				{if (flag_1) fprintf(yyout, "ASSIGN\n"); col+=yyleng; i_semicolon=0;}
+"*"				{if (flag_1) fprintf(yyout, "STAR\n"); col+=yyleng; i_semicolon=0;}
+"/"				{if (flag_1) fprintf(yyout, "DIV\n"); col+=yyleng; i_semicolon=0;}
+"-"				{if (flag_1) fprintf(yyout, "MINUS\n"); col+=yyleng; i_semicolon=0;}
+"+"				{if (flag_1) fprintf(yyout, "PLUS\n"); col+=yyleng; i_semicolon=0;}
+"=="			{if (flag_1) fprintf(yyout, "EQ\n"); col+=yyleng; i_semicolon=0;}
+">="			{if (flag_1) fprintf(yyout, "GE\n"); col+=yyleng; i_semicolon=0;}
+">"				{if (flag_1) fprintf(yyout, "GT\n"); col+=yyleng; i_semicolon=0;}
+"{"				{if (flag_1) fprintf(yyout, "LBRACE\n"); start_brace = 1; col+=yyleng;i_semicolon=0;}
+"<="			{if (flag_1) fprintf(yyout, "LE\n"); col+=yyleng; i_semicolon=0;}
+"("				{if (flag_1) fprintf(yyout, "LPAR\n"); col+=yyleng; i_semicolon=0;}
+"["				{if (flag_1) fprintf(yyout, "LSQ\n"); col+=yyleng; i_semicolon=0;}	
+"<"				{if (flag_1) fprintf(yyout, "LT\n"); col+=yyleng; i_semicolon=0;}
+"%"				{if (flag_1) fprintf(yyout, "MOD\n"); col+=yyleng; i_semicolon=0;}
+"!="			{if (flag_1) fprintf(yyout, "NE\n"); col+=yyleng; i_semicolon=0;}
+"!"				{if (flag_1) fprintf(yyout, "NOT\n"); col+=yyleng; i_semicolon=0;}
+"&&"			{if (flag_1) fprintf(yyout, "AND\n"); col+=yyleng; i_semicolon=0;}
+"||"			{if (flag_1) fprintf(yyout, "OR\n"); col+=yyleng; i_semicolon=0;}
+"}"				{if (flag_1) fprintf(yyout, "RBRACE\n"); col+=yyleng; i_semicolon=1;}
+")"				{if (flag_1) fprintf(yyout, "RPAR\n"); col+=yyleng; i_semicolon=1;}
+"]"				{if (flag_1) fprintf(yyout, "RSQ\n"); col+=yyleng; i_semicolon=1;}
+"package"		{if (flag_1) fprintf(yyout, "PACKAGE\n"); col+=yyleng; i_semicolon=0;}
+"return"		{if (flag_1) fprintf(yyout, "RETURN\n"); col+=yyleng; i_semicolon=1;}
+"else"			{if (flag_1) fprintf(yyout, "ELSE\n"); col+=yyleng; i_semicolon=0;}
+"for"			{if (flag_1) fprintf(yyout, "FOR\n"); col+=yyleng; i_semicolon=0;}
+"if"			{if (flag_1) fprintf(yyout, "IF\n"); col+=yyleng; i_semicolon=0;}
+"var"			{if (flag_1) fprintf(yyout, "VAR\n"); col+=yyleng; i_semicolon=0;}
+"int"			{if (flag_1) fprintf(yyout, "INT\n"); col+=yyleng; i_semicolon=0;}
+"float32"		{if (flag_1) fprintf(yyout, "FLOAT32\n"); col+=yyleng; i_semicolon=0;}
+"bool"			{if (flag_1) fprintf(yyout, "BOOL\n"); col+=yyleng; i_semicolon=0;}
+"string"		{if (flag_1) fprintf(yyout, "STRING\n"); col+=yyleng; i_semicolon=0;}
+"fmt.Println"	{if (flag_1) fprintf(yyout, "PRINT\n"); col+=yyleng; i_semicolon=0;}
+"strconv.Atoi"	{if (flag_1) fprintf(yyout, "PARSEINT\n"); col+=yyleng; i_semicolon=0;}
+"func"			{if (flag_1) fprintf(yyout, "FUNC\n"); col+=yyleng; i_semicolon=0;}
+"os.Args"		{if (flag_1) fprintf(yyout, "CMDARGS\n"); col+=yyleng; i_semicolon=0;}
 "/*"			{col++; comment_lines = 0; comment_cols = 0; swaped_line = 0; BEGIN BCOMMENT;}
 "//"			{col++; BEGIN LCOMMENT;}
 
-"++"|"--"		{if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"break"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"case"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"chan"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"const"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"continue"      {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"default"       {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"defer"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"fallthrough"   {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"go"            {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"import"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"goto"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"interface"     {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"map"           {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"range"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"select"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"struct"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"switch"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
-"type"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng;}
+"++"|"--"		{if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"break"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"case"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"chan"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"const"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"continue"      {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"default"       {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"defer"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"fallthrough"   {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"go"            {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"import"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"goto"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"interface"     {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"map"           {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"range"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"select"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"struct"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"switch"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
+"type"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
 
-0[0-7]+                         {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
-0([0-7]*[8-9]+[0-7]*)+             {if (flag_1) fprintf(yyout, "Line %d, column %d: invalid octal constant (%s)\n",line,++col, yytext); col+=yyleng-1; BEGIN SEMICOLON; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
-0[xX][0-9a-fA-F]+               {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes hexadecimais (0x ou 0X seguido por dígitos e letras a-f ou A-F)
-[0-9]+                          {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON; }    // NATURAL: Constantes decimais (sequência de dígitos 0-9)
-({float}{exp}?|{number}+{exp})  {if (flag_1) fprintf(yyout, "DECIMAL(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
-{letter}[a-zA-Z0-9_]*			{if (flag_1) fprintf(yyout, "IDENTIFIER(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
+0[0-7]+                         {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; i_semicolon=1; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
+0([0-7]*[8-9]+[0-7]*)+          {if (flag_1) fprintf(yyout, "Line %d, column %d: invalid octal constant (%s)\n",line,++col, yytext); col+=yyleng-1; }    // NATURAL: Constantes octais (começa com 0, seguido por dígitos de 0 a 7)
+0[xX][0-9a-fA-F]+               {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; i_semicolon=1;}
+[0-9]+                          {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); col+=yyleng; i_semicolon=1; }    // NATURAL: Constantes decimais (sequência de dígitos 0-9)
+({float}{exp}?|{number}+{exp})  {if (flag_1) fprintf(yyout, "DECIMAL(%s)\n", yytext); col+=yyleng; i_semicolon=1;}
+{letter}[a-zA-Z0-9_]*			{if (flag_1) fprintf(yyout, "IDENTIFIER(%s)\n", yytext); col+=yyleng; i_semicolon=1;}
 \"                              {yyless(0); BEGIN STRING;}
 
-{newline}				    			  {line++; col = 0;}
-{whispace}                                {col+=yyleng;}
-.				        				  {col+=1; fprintf(yyout, "Line %d, column %d: illegal character (%s)\n", line, col, yytext);col+=yyleng-1;int next_char = input();if (next_char != EOF) {unput(next_char);BEGIN SEMICOLON;}}
+
 
 <BCOMMENT>"*/" 	        				  {line+=comment_lines; if (swaped_line) col = 0; else col++; col+=comment_cols+yyleng; BEGIN 0;}
 <BCOMMENT>{newline}        	              {comment_lines++; comment_cols = 0; swaped_line = 1;}
 <BCOMMENT><<EOF>>                         {fprintf(yyout, "Line %d, column %d: unterminated comment\n", line, col); yyterminate();}
 <BCOMMENT>.     	        	          {comment_cols+=yyleng;}
 
-<LCOMMENT>{newline} 	        		  {line++; col = 0; BEGIN 0;}
+<LCOMMENT>{newline} 	        		  {if(flag_1 && i_semicolon==1) fprintf(yyout, "SEMICOLON\n");i_semicolon=0;line++; col = 0; BEGIN 0;}
 <LCOMMENT>. 	        				  {;}
 
-<SEMICOLON>{newline}                      {if (flag_1) fprintf(yyout, "SEMICOLON\n"); line++; col = 0; BEGIN 0;}
+<SEMICOLON>{newline}                      {if (flag_1) fprintf(yyout, "SEMICOLON\n");line++; col = 0; BEGIN 0;}
 <SEMICOLON>{whispace}	                  {col+=yyleng;}
 <SEMICOLON>"/*"                           {col++; comment_lines = 0; comment_cols = 0; swaped_line = 0; BEGIN SEMIBCOMMENT;}
 <SEMICOLON>"//"                           {BEGIN SEMILCOMMENT;}
 <SEMICOLON>.                              {yyless(0); BEGIN 0;}
 <SEMICOLON><<EOF>>                        {if (flag_1) fprintf(yyout, "SEMICOLON\n"); yyterminate();}
+
+
 
 <SEMIBCOMMENT>"*/" 	        				  {line+=comment_lines; if (swaped_line) col = 0; else col++; col+=comment_cols+yyleng; if (swaped_line) {fprintf(yyout, "SEMICOLON\n"); BEGIN 0;} else BEGIN SEMICOLON;}
 <SEMIBCOMMENT>{newline}        	              {comment_lines++; comment_cols = 0; swaped_line=1; }
@@ -129,21 +158,58 @@ whispace (" "|\t)
 <INVALID_STRING>\\(\"|n|r|t|f|\\)           {comment_cols+=yyleng;}
 <INVALID_STRING>\\[^\\\"nrtf\r\n]           {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
 <INVALID_STRING>\\                          {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
-<INVALID_STRING><<EOF>>                       {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); yyterminate();}
-<INVALID_STRING>.                             {comment_cols+=yyleng;}
+<INVALID_STRING><<EOF>>                     {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); yyterminate();}
+<INVALID_STRING>.                           {comment_cols+=yyleng;}
 
+
+{newline}				    			  {line++; col = 0;if(i_semicolon == 1 && start_brace == 0)fprintf(yyout, "SEMICOLON\n"); i_semicolon=0;start_brace=0;BEGIN 0;}
+{whispace}                                {col+=yyleng;}
+.				        				  {col+=1; fprintf(yyout, "Line %d, column %d: illegal character (%s)\n", line, col, yytext);col+=yyleng-1;int next_char = input();if (next_char != EOF) {unput(next_char);}}
+
+<<EOF>>                                     { if (i_semicolon == 1) if (flag_1) fprintf(yyout, "SEMICOLON\n");return 0;}
 %%
+
+
+
+
+int main(int argc, char **argv) {
+    if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't') {
+        flag = 't';
+    }
+
+    yyparse(); // <<<<< sempre chama o parser
+
+    if (flag == 't') {
+        dfs(root, 0); // <<<<< só imprime a árvore se for -t
+    }
+
+    return 0;
+}
+
+/*
 
 int main(int argc, char *argv[]){
     if (argv[1] != 0 && (argv[1][0] == '-' && argv[1][1] == 'l')){
         //checkig for argument -l like this so we dont have to import string.h
         flag_1 = 1;
     }   
-    yylex();
+
+    if (argv[1][1] == 'l') {
+    // análise lexical apenas
+        yylex();
+    } else {
+        // análise sintática
+        yyparse();
+    }
+
     return 0;
 }
+... (restante das regras Lex) ... */
 
 int yywrap(){
     return 1;
 }
 
+/*void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s at line %d, column %d\n", s, line, col);
+}*/
