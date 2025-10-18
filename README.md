@@ -13,3 +13,6 @@ Segundo o tomas na submissao de 2021:
         G -> 29/35      :: AST - Statements
         H -> 40/40      :: AST - Full Programs 
     */
+
+OBJETIVO ATUAL:
+FAZER COM QUE IMPRIMA A ARVORE
