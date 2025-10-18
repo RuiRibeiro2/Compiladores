@@ -1,9 +1,6 @@
 %{
-    // Francisco - 
-    // Rui - 
-    //alterado Id - > IDENTIFIER, INTLIT->natural, 
-    //falta REALLIT - > DECIMAL
-    //STRLIT FICA IGUAL
+    // Tomás Mendes - 2019232272
+    // Joel Oliveira - 2019227468
     #include "structures.h"
     #include "y.tab.h"
     #include <string.h>
@@ -102,10 +99,10 @@ whispace (" "|\t)
 "switch"        {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext);previous_col = col; col+=yyleng; yylval.id=strdup(yytext);error_line=0; return RESERVED;}
 "type"          {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); previous_col = col;col+=yyleng; yylval.id=strdup(yytext); error_line=0;return RESERVED;}
 
-0                               {error_line=0;yyless(0); BEGIN OCTAL;}                //OS RETURNS SAO APANHADOS PELO PARSER NO .Y
-[1-9]{number}*|{hexa}          	{if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); previous_col = col;col+=yyleng; yylval.id = strdup(yytext); error_line=0;  BEGIN _SEMICOLON; return NATURAL; }    //MUDADO DE INTLIT NATURAL
-({float}{exp}?|{number}+{exp})  {if (flag_1) fprintf(yyout, "DECIMAL(%s)\n", yytext); previous_col = col;col+=yyleng; yylval.id = strdup(yytext); error_line=0; BEGIN _SEMICOLON; return DECIMAL;} //MUDAR: DECIMAL, REALLIT
-{letter}[a-zA-Z0-9_]*			{if (flag_1) fprintf(yyout, "IDENTIFIER(%s)\n", yytext); yylval.id =strdup(yytext); previous_col = col;col+=yyleng; error_line=0; BEGIN _SEMICOLON; return IDENTIFIER;}  //MUDAR: IDENTIFIER, ID
+0                               {error_line=0;yyless(0); BEGIN OCTAL;}
+[1-9]{number}*|{hexa}          	{if (flag_1) fprintf(yyout, "INTLIT(%s)\n", yytext); previous_col = col;col+=yyleng; yylval.id = strdup(yytext); error_line=0;  BEGIN _SEMICOLON; return INTLIT; }
+({float}{exp}?|{number}+{exp})  {if (flag_1) fprintf(yyout, "REALLIT(%s)\n", yytext); previous_col = col;col+=yyleng; yylval.id = strdup(yytext); error_line=0; BEGIN _SEMICOLON; return REALLIT;}
+{letter}[a-zA-Z0-9_]*			{if (flag_1) fprintf(yyout, "ID(%s)\n", yytext); yylval.id =strdup(yytext); previous_col = col;col+=yyleng; error_line=0; BEGIN _SEMICOLON; return ID;}
 \"                              {error_line=0;yyless(0); BEGIN _STRING;}
 
 {newline}				    			  {previous_line = line++; previous_col = col;col = 0; error_line=1;}
@@ -151,7 +148,7 @@ whispace (" "|\t)
 <INVALID_STRING><<EOF>>                    {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); error_line=0; BEGIN CHECK_EOF;}
 <INVALID_STRING>.                          {comment_cols+=yyleng; error_line=0;}
 
-<OCTAL>0[0-7]*                             {if (flag_1) fprintf(yyout, "NATURAL(%s)\n", yytext); yylval.id = strdup(yytext); previous_col = col; col+=yyleng; error_line=0; BEGIN _SEMICOLON; return NATURAL;}
+<OCTAL>0[0-7]*                             {if (flag_1) fprintf(yyout, "INTLIT(%s)\n", yytext); yylval.id = strdup(yytext); previous_col = col; col+=yyleng; error_line=0; BEGIN _SEMICOLON; return INTLIT;}
 <OCTAL>[0-9]+                              {previous_col = col++; fprintf(yyout, "Line %d, column %d: invalid octal constant (%s)\n", line, col, yytext); previous_col = col; col+=yyleng-1; error_line=0; BEGIN _SEMICOLON; BEGIN 0;}
 <OCTAL>.                                   {yyless(0); error_line=0; BEGIN 0;}
 

@@ -69,8 +69,7 @@
 %token FOR IF VAR PRINT PARSEINT FUNC CMDARGS INT FLOAT32 STRING BOOL      //linhas 55-65
 %token UNARY
 
-//%token<id> ID STRLIT INTLIT REALLIT RESERVED  //original  
-%token<id> IDENTIFIER STRLIT NATURAL DECIMAL RESERVED
+%token<id> ID STRLIT INTLIT REALLIT RESERVED
 %type<ip> program
 %type<idl> declarations
 %type<idec> var_dec func_dec
@@ -110,7 +109,7 @@
 
 %%
 
-program: PACKAGE IDENTIFIER SEMICOLON declarations {$$ = program = insert_program($4); if (!error_flag && flag_2) print_ast(program);}
+program: PACKAGE ID SEMICOLON declarations {$$ = program = insert_program($4); if (!error_flag && flag_2) print_ast(program);}
         ;
 
 declarations:    /*EMPTY*/                              {$$ = NULL;}  
@@ -123,10 +122,10 @@ var_dec:    VAR var_spec                         { $$ = insert_var_declaration($
         |   VAR LPAR var_spec SEMICOLON RPAR     { $$ = insert_var_declaration($3);}
         ;
 
-var_spec: IDENTIFIER comma_id_rec type   { $$ = insert_var_specifications($1, $2, $3);}
+var_spec: ID comma_id_rec type   { $$ = insert_var_specifications($1, $2, $3);}
         ;
 comma_id_rec:   /*EMPTY*/               { $$ = NULL;}
-            |   comma_id_rec COMMA IDENTIFIER   { $$ = insert_var_id($1, $3);}
+            |   comma_id_rec COMMA ID   { $$ = insert_var_id($1, $3);}
             ;
 
 type:   INT             { $$ = insert_type("INT");}
@@ -135,15 +134,15 @@ type:   INT             { $$ = insert_type("INT");}
     |   STRING          { $$ = insert_type("STR");}
     ;
 
-func_dec:   FUNC IDENTIFIER LPAR parameters RPAR type func_body     { $$=insert_func_declaration($2, $4, $6, $7);}
-        |   FUNC IDENTIFIER LPAR RPAR type func_body                { $$=insert_func_declaration($2, NULL, $5, $6);}
-        |   FUNC IDENTIFIER LPAR parameters RPAR func_body          { $$=insert_func_declaration($2, $4, d_dummy, $6);}
-        |   FUNC IDENTIFIER LPAR RPAR func_body                     { $$=insert_func_declaration($2, NULL, d_dummy, $5);}
+func_dec:   FUNC ID LPAR parameters RPAR type func_body     { $$=insert_func_declaration($2, $4, $6, $7);}
+        |   FUNC ID LPAR RPAR type func_body                { $$=insert_func_declaration($2, NULL, $5, $6);}
+        |   FUNC ID LPAR parameters RPAR func_body          { $$=insert_func_declaration($2, $4, d_dummy, $6);}
+        |   FUNC ID LPAR RPAR func_body                     { $$=insert_func_declaration($2, NULL, d_dummy, $5);}
         ;
 
-parameters: IDENTIFIER type comma_id_type_rec               {  $$ = insert_parameter($1, $2, $3);};
+parameters: ID type comma_id_type_rec               {  $$ = insert_parameter($1, $2, $3);};
 comma_id_type_rec:   /*EMPTY*/                     { $$ = NULL; }
-                | comma_id_type_rec COMMA IDENTIFIER type   {   $$ = insert_id_type($1, $3, $4);}
+                | comma_id_type_rec COMMA ID type   {   $$ = insert_id_type($1, $3, $4);}
                 ;
 
 func_body: LBRACE vars_and_statements RBRACE    { $$ = insert_func_body($2);}
@@ -162,7 +161,7 @@ statements: IF expr_or states_in_brace                          { /* printf("sta
         |   RETURN                                              { /* printf("state6\n"); */ $$ = insert_return_statement(NULL);  }
         |   PRINT LPAR expr_or RPAR                             { /* printf("state7\n"); */$$ = insert_print_expr_statement($3); }    
         |   PRINT LPAR STRLIT RPAR                              { /* printf("state8\n"); */$$ = insert_print_str_statement($3);  }
-        |   IDENTIFIER ASSIGN expr_or                                   { /* printf("state9\n") */;$$ = insert_assign_statement($1, $3); }
+        |   ID ASSIGN expr_or                                   { /* printf("state9\n") */;$$ = insert_assign_statement($1, $3); }
         |   states_in_brace                                     { /* printf("state10\n"); */$$ = insert_statements_list($1); }
         |   final_states                                        { /* printf("state11\n"); */$$ = insert_final_statement($1); }
         |   error                {error_flag = 1;}
@@ -176,13 +175,13 @@ states_in_brace: LBRACE state_semic_rec RBRACE          { $$ = $2; };
 state_semic_rec: /*EMPTY*/                              { $$ = NULL ; }
                 | state_semic_rec statements SEMICOLON  {   $$ = insert_statement_in_list($1, $2);}
                 ;
-parse_args: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr_or RSQ RPAR {  /* printf("parse\n"); */ $$ = insert_parse_args($1, $9); }
-        |   IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR                {error_flag = 1; }
+parse_args: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr_or RSQ RPAR {  /* printf("parse\n"); */ $$ = insert_parse_args($1, $9); }
+        |   ID COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR                {error_flag = 1; }
         ;
 
-func_invocation: IDENTIFIER LPAR error RPAR                 { error_flag = 1; }
-            |   IDENTIFIER LPAR expr_or comma_expr_rec RPAR    {$$ = insert_func_inv($1, $3, $4);}
-            |   IDENTIFIER LPAR RPAR                        {  $$ = insert_func_inv($1, NULL, NULL);}
+func_invocation: ID LPAR error RPAR                 { error_flag = 1; }
+            |   ID LPAR expr_or comma_expr_rec RPAR    {$$ = insert_func_inv($1, $3, $4);}
+            |   ID LPAR RPAR                        {  $$ = insert_func_inv($1, NULL, NULL);}
             ;
 comma_expr_rec: /*EMPTY*/                   { $$ = NULL;}
             |   comma_expr_rec COMMA expr_or   { $$ = insert_expression($1, $3);}
@@ -212,9 +211,9 @@ self_expr: self_oper self_expr %prec UNARY              {$$ = insert_self($2, $1
         |  final_expr                                   {$$ = insert_self(NULL, d_final, $1); }
         ;
 
-final_expr:   NATURAL               {$$ = insert_natural($1); }        //mudado insert_intlit   
-          |   DECIMAL               {$$ = insert_decimal($1); }            // mudado insert_real
-          |   IDENTIFIER            {$$ = insert_id($1); } 
+final_expr:   INTLIT               {$$ = insert_intlit($1); }           
+          |   REALLIT               {$$ = insert_real($1); } 
+          |   ID                    {$$ = insert_id($1); } 
           |   func_invocation       {$$ = insert_final_func_inv($1); } 
           |   LPAR expr_or RPAR        { $$ = insert_final_expr($2);} 
           |   LPAR error RPAR         {error_flag = 1;}

@@ -1,0 +1,4 @@
+yacc -d -v -t -g --report=all gocompiler.y
+flex gocompiler.l
+gcc -o gocompiler lex.yy.c y.tab.c functions.c print_ast.c -lfl -Wall -Wno-unused-function
+./gocompiler -t < funcParams.dgo | diff funcParams.out -
