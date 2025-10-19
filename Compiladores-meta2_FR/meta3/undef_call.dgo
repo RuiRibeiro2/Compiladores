@@ -1,0 +1,5 @@
+package main
+func f(a bool) { }
+func x() {
+	f(1);
+}

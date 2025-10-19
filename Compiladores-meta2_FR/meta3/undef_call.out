@@ -1,0 +1,29 @@
+Line 4, column 2: Cannot find symbol f(int)
+===== Global Symbol Table =====
+f	(bool)	none
+x	()	none
+
+===== Function f(bool) Symbol Table =====
+return		none
+a		bool	param
+
+===== Function x() Symbol Table =====
+return		none
+
+Program
+..FuncDecl
+....FuncHeader
+......Identifier(f)
+......FuncParams
+........ParamDecl
+..........Bool
+..........Identifier(a)
+....FuncBody
+..FuncDecl
+....FuncHeader
+......Identifier(x)
+......FuncParams
+....FuncBody
+......Call - undef
+........Identifier(f) - undef
+........Natural(1) - int

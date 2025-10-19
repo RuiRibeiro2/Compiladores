@@ -1,0 +1,27 @@
+Line 2, column 19: Symbol a already defined
+Line 2, column 46: Incompatible type void in return statement
+===== Global Symbol Table =====
+func_	(int,int,float32)	string
+
+===== Function func_(int,int,float32) Symbol Table =====
+return		string
+a		int	param
+b		float32	param
+
+Program
+..FuncDecl
+....FuncHeader
+......Identifier(func_)
+......String
+......FuncParams
+........ParamDecl
+..........Int
+..........Identifier(a)
+........ParamDecl
+..........Int
+..........Identifier(a)
+........ParamDecl
+..........Float32
+..........Identifier(b)
+....FuncBody
+......Return

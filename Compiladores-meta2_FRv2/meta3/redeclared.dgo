@@ -1,0 +1,2 @@
+package main; 
+func func_(a int, a int, b float32) string { return; }

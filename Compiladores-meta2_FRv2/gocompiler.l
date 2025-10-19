@@ -1,33 +1,42 @@
 %{
-    /*
-    Projeto de Compiladores 2023/2024~
-    Meta 2
-    2021189478 - Rui Ribeiro
-    2021221169 - Francisco Rodrigues
-    */
     //gocompiler_v4 teste de substituicao dos comments - resultado correu bem apenas 0 erros agora - corrigido tirar i_semi dos comentarios
-    
     int line = 1;
     int comment_lines = 1; 
     int col = 0;
     int comment_cols = 0;
-    int flag_1, swaped_line;
+    int flag_1 = 0, swaped_line;
     int i_semicolon = 0;
     int start_brace = 0;
 
-    int str_start_line = 0;
-    int str_start_col = 0;
-    char str_buffer[4096];
-    int str_buffer_index = 0;
-    int str_error = 0;
-    int ml_comment_start_line = 0;
-    int ml_comment_start_col = 0;
+    #include <ctype.h>
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdlib.h>
 
-    void reset_str_buffer() {
-        str_buffer_index = 0;
-        str_buffer[0] = '\0';
-    }
+    #include "ast.h"
+    #include "semantics.h"
+
+    /* variável partilhada que o parser usa para sinalizar erros de sintaxe */
+    int synerr = 0;
+
+    int yyparse(void);
+
+
+    /* Variáveis externas */
+    extern int yylex(void);
+    extern int yylineno;
+    extern char *yytext;
+    extern struct node *root;
+
+
+    /* Corrige o aviso de yyparse */
+    int yyparse(void);
+
+    /* Flag para controlar o modo de operação (-l ou -t) */
+    char flag = 0;
 %}
+
+
 
 letter  [a-zA-Z_]
 number  [0-9]
@@ -139,20 +148,20 @@ whispace (" "|\t)
 <SEMILCOMMENT><<EOF>>                         {fprintf(yyout, "SEMICOLON\n"); yyterminate();}
 <SEMILCOMMENT>. 	        				  {;}
 
-<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}// ← CORREÇÃO: resetar flag
+<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
 <STRING>\"(\\(\"|n|r|t|f|\\)|[^\\\"\r\n])*\"                    {if (flag_1) fprintf(yyout, "STRLIT(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
 <STRING>\"[^\"\r\n]*\\[^\\\"nrtf][^\"\r\n]*\"                   {yyless(0); BEGIN DUMMY_QUOTE;}
 <STRING>\"[^\"\r\n]*{newline}?                                  {yyless(0); BEGIN DUMMY_QUOTE;}
 
 <DUMMY_QUOTE>\"                            {col++; comment_cols = 1; BEGIN INVALID_STRING;}
 
-<INVALID_STRING>\"                          {col+=comment_cols; BEGIN 0;} // ← CORREÇÃO: resetar flag
-<INVALID_STRING>{newline}                   {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;} // ← CORREÇÃO: resetar flag
+<INVALID_STRING>\"                          {col+=comment_cols; BEGIN 0;}
+<INVALID_STRING>{newline}                   {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
 <INVALID_STRING>\\(\"|n|r|t|f|\\)           {comment_cols+=yyleng;}
 <INVALID_STRING>\\[^\\\"nrtf\r\n]           {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
 <INVALID_STRING>\\                          {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
-<INVALID_STRING><<EOF>>                     {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); yyterminate(); }
-<INVALID_STRING>.                           {comment_cols+=yyleng; }
+<INVALID_STRING><<EOF>>                     {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); yyterminate();}
+<INVALID_STRING>.                           {comment_cols+=yyleng;}
 
 
 {newline}				    			  {line++; col = 0;if(i_semicolon == 1 && start_brace == 0)fprintf(yyout, "SEMICOLON\n"); i_semicolon=0;start_brace=0;BEGIN 0;}
@@ -162,17 +171,61 @@ whispace (" "|\t)
 <<EOF>>                                     { if (i_semicolon == 1) if (flag_1) fprintf(yyout, "SEMICOLON\n");return 0;}
 %%
 
+
+
+
+int main(int argc, char **argv) {
+    int i;
+    /* aceitar -l e -t em qualquer posição (mais robusto) */
+    for (i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (strchr(argv[i], 'l')) flag_1 = 1;
+            if (strchr(argv[i], 't')) flag = 't';
+            if (strchr(argv[i], 's')) flag = 's'; /* opcional: manter compatibilidade */
+        }
+    }
+
+    /* sempre chama o parser (constrói a AST em 'root') */
+    yyparse();
+
+    /* só imprime a árvore se foi pedido -t e não houve erros de sintaxe */
+    if (flag == 't' && synerr == 0) {
+        dfs(root, 0);
+    }
+
+    /* se não for pedido -t e não houve erro sintático, executar análise semântica */
+    if (flag != 't' && synerr == 0) {
+        int serrs = check_program(root);
+        (void)serrs; /* serrs já imprime mensagens */
+    }
+
+    return 0;
+}
+
+/*
+
 int main(int argc, char *argv[]){
     if (argv[1] != 0 && (argv[1][0] == '-' && argv[1][1] == 'l')){
         //checkig for argument -l like this so we dont have to import string.h
         flag_1 = 1;
     }   
 
-    yylex();
+    if (argv[1][1] == 'l') {
+    // análise lexical apenas
+        yylex();
+    } else {
+        // análise sintática
+        yyparse();
+    }
+
     return 0;
 }
+... (restante das regras Lex) ... */
 
 int yywrap(){
     return 1;
 }
 
+/*void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s at line %d, column %d\n", s, line, col);
+}*/
