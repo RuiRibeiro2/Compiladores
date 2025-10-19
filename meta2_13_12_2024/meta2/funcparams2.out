@@ -1,7 +1,0 @@
-Program
-..FuncDecl
-....FuncHeader
-......Identifier(main)
-......Int
-......FuncParams
-....FuncBody

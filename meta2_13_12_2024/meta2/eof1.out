@@ -1,9 +1,0 @@
-Program
-..FuncDecl
-....FuncHeader
-......Identifier(main)
-......FuncParams
-....FuncBody
-......Assign
-........Identifier(h)
-........Natural(2)

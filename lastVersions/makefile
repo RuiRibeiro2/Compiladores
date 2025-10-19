@@ -1,16 +1,26 @@
-LEX=flex
-CC=gcc
-LEX_SRC=gocompiler184v1.l
-LEX_OUT=lex.yy.c
-TARGET=gocompiler184v1
+# Makefile para compilar o gocompiler
 
-all: $(TARGET)
+# Variáveis
+CC = gcc
+FLEX = flex
+BISON = bison
+CFLAGS = -Wall -g
 
-$(LEX_OUT): $(LEX_SRC)
-	$(LEX) $(LEX_SRC)
+# Arquivos
+TARGET = gocompiler184
+LEX_FILE = gocompiler184.l
+YACC_FILE = gocompiler.y
+AST_FILES = ast.c ast.h
 
-$(TARGET): $(LEX_OUT)
-	$(CC) -o $(TARGET) $(LEX_OUT) -lfl
+# Regra padrão
+$(TARGET): lex.yy.c y.tab.c $(AST_FILES)
+	$(CC) $(CFLAGS) lex.yy.c y.tab.c ast.c -o $(TARGET)
+
+lex.yy.c: $(LEX_FILE)
+	$(FLEX) $(LEX_FILE)
+
+y.tab.c: $(YACC_FILE)
+	$(BISON) -d -y $(YACC_FILE)
 
 clean:
-	rm -f $(LEX_OUT) $(TARGET)
+	rm -f $(TARGET) lex.yy.c y.tab.c y.tab.h

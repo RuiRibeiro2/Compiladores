@@ -1,6 +1,0 @@
-Program
-..FuncDecl
-....FuncHeader
-......Identifier(main)
-......FuncParams
-....FuncBody

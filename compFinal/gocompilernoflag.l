@@ -6,7 +6,8 @@
     2021221169 - Francisco Rodrigues
     */
     //gocompiler_v4 teste de substituicao dos comments - resultado correu bem apenas 0 erros agora - corrigido tirar i_semi dos comentarios
-    
+    //igual a extra mas sem a flagS
+
     #include "y.tab.h"
     #include "ast.h"
     #include <stdio.h>
@@ -119,15 +120,15 @@ reservedWords "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defe
 <SEMILCOMMENT><<EOF>>                         {fprintf(yyout, "SEMICOLON\n"); yyterminate();}
 <SEMILCOMMENT>. 	        				  {;}
 
-<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
+<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; i_semicolon = 0; BEGIN 0;}
 <STRING>\"(\\(\"|n|r|t|f|\\)|[^\\\"\r\n])*\"                    {if (flag_1) fprintf(yyout, "STRLIT(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
 <STRING>\"[^\"\r\n]*\\[^\\\"nrtf][^\"\r\n]*\"                   {yyless(0); BEGIN DUMMY_QUOTE;}
 <STRING>\"[^\"\r\n]*{newline}?                                  {yyless(0); BEGIN DUMMY_QUOTE;}
 
 
-<DUMMY_QUOTE>\"                             {col++; comment_cols = 1; BEGIN INVALID_STRING;}
+<DUMMY_QUOTE>\"                             {col++; comment_cols = 1; i_semicolon = 0; BEGIN INVALID_STRING;} // ← CORREÇÃO: não ativar semicolon para strings inválidas
 <INVALID_STRING>\"                          {col+=comment_cols; BEGIN 0;}
-<INVALID_STRING>{newline}                   {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}
+<INVALID_STRING>{newline}                   {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; i_semicolon = 0; BEGIN 0;} // ← CORREÇÃO: resetar flag
 <INVALID_STRING>\\(\"|n|r|t|f|\\)           {comment_cols+=yyleng;}
 <INVALID_STRING>\\[^\\\"nrtf\r\n]           {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
 <INVALID_STRING>\\                          {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
@@ -146,10 +147,57 @@ int main(int argc, char *argv[]){
     if (argv[1] != 0 && (argv[1][0] == '-' && argv[1][1] == 'l')){
         //checkig for argument -l like this so we dont have to import string.h
         flag_1 = 1;
-    }   
+        yylex();
+    } 
+    if (argv[1] != 0 && (argv[1][0] == '-' && argv[1][1] == 't')){
+        //flag para returns
+        //flag_2 = 1;    //CRIAR FLAG2 PARA OS RETURNS -> VER flag_return DA meta3_sb_v1
+        yyparse();
 
-            yylex();
+        //CRIAR FLAG3 PARA OS ERROS SINTATICOS -> VER flag_syntax_error DA meta3_sb_v1
+        //flag para erros de sintase
+        if(flag_3 == 0){  
+            printtree(program_root, 0);
+        }
+    }  
+    
     return 0;
+}
+*/
+int main(int argc, char *argv[]){
+    if (argc > 1) {
+        if (strcmp(argv[1], "-l") == 0) {
+            // Apenas análise léxica com tokens
+            flag_1 = 1;
+            yylex();
+        } else if (strcmp(argv[1], "-t") == 0) {
+            // Análise sintática + AST
+            flag_1 = 1;
+            yyparse();
+            if(flag_3 == 0){  
+                printtree(program_root, 0);
+            }
+        } else {
+            // Sem opção - apenas análise com mensagens de erro
+            yyparse();
+        }
+    } else {
+        // Sem argumentos - apenas análise com mensagens de erro
+        yyparse();
+    }
+    
+    return 0;
+}
+
+/*void yyerror(const char *s) {
+    flag_3_syntax_error = 1;
+    fprintf(stderr, "%s\n", s); // Apenas imprime a mensagem de erro
+    //printf ("Line %d, column %d: %s: %s\n", last_line_pos, last_col_pos, str, yytext);
+}*/
+
+void yyerror(const char *s) {
+    flag_3 = 1;
+    printf("Line %d, column %d: syntax error: %s\n", syntax_error_line, syntax_error_column, yytext);
 }
 
 int yywrap(){

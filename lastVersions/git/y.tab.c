@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "gocompiler (1).y"
+#line 1 "gocompiler.y"
 
 /*
     Authors:
@@ -229,7 +229,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 20 "gocompiler (1).y"
+#line 20 "gocompiler.y"
 
     char *lexeme;
     struct node *node;
@@ -341,7 +341,7 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 /* Second part of user prologue.  */
-#line 26 "gocompiler (1).y"
+#line 26 "gocompiler.y"
 
 #define LOCATE(node, line, column) { node->token_line = line; node->token_column = column;}
 
@@ -1545,7 +1545,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* Program: PACKAGE IDENTIFIER SEMICOLON Declarations  */
-#line 68 "gocompiler (1).y"
+#line 68 "gocompiler.y"
                         {
                             (yyval.node) = program = new_node(Program, NULL); 
                             add_child((yyval.node), (yyvsp[0].node));
@@ -1554,7 +1554,7 @@ yyreduce:
     break;
 
   case 3: /* Declarations: Declarations FuncDecl SEMICOLON  */
-#line 75 "gocompiler (1).y"
+#line 75 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-2].node);
                             add_child((yyval.node), (yyvsp[-1].node));
@@ -1563,7 +1563,7 @@ yyreduce:
     break;
 
   case 4: /* Declarations: Declarations VarDecl SEMICOLON  */
-#line 80 "gocompiler (1).y"
+#line 80 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-2].node);
 
@@ -1576,7 +1576,7 @@ yyreduce:
     break;
 
   case 5: /* Declarations: %empty  */
-#line 89 "gocompiler (1).y"
+#line 89 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -1584,7 +1584,7 @@ yyreduce:
     break;
 
   case 6: /* VarDecl: VAR VarSpec  */
-#line 101 "gocompiler (1).y"
+#line 101 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[0].node);
                         }
@@ -1592,7 +1592,7 @@ yyreduce:
     break;
 
   case 7: /* VarDecl: VAR LPAR VarSpec SEMICOLON RPAR  */
-#line 105 "gocompiler (1).y"
+#line 105 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-2].node);
                         }
@@ -1600,7 +1600,7 @@ yyreduce:
     break;
 
   case 8: /* VarSpec: IDENTIFIER StarCommaId Type  */
-#line 111 "gocompiler (1).y"
+#line 111 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                             struct node *new_decl = new_node(VarDecl, NULL);
@@ -1669,7 +1669,7 @@ yyreduce:
     break;
 
   case 9: /* StarCommaId: StarCommaId COMMA IDENTIFIER  */
-#line 179 "gocompiler (1).y"
+#line 179 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-2].node);
                             struct node *new_decl = new_node(VarDecl, NULL);
@@ -1683,7 +1683,7 @@ yyreduce:
     break;
 
   case 10: /* StarCommaId: %empty  */
-#line 189 "gocompiler (1).y"
+#line 189 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -1691,7 +1691,7 @@ yyreduce:
     break;
 
   case 11: /* Type: INT  */
-#line 198 "gocompiler (1).y"
+#line 198 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Int, NULL);
                         }
@@ -1699,7 +1699,7 @@ yyreduce:
     break;
 
   case 12: /* Type: FLOAT32  */
-#line 202 "gocompiler (1).y"
+#line 202 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Float32, NULL);    
                         }
@@ -1707,7 +1707,7 @@ yyreduce:
     break;
 
   case 13: /* Type: BOOL  */
-#line 206 "gocompiler (1).y"
+#line 206 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Bool, NULL);
                         }
@@ -1715,7 +1715,7 @@ yyreduce:
     break;
 
   case 14: /* Type: STRING  */
-#line 210 "gocompiler (1).y"
+#line 210 "gocompiler.y"
                         {
                             (yyval.node) = new_node(String, NULL);
                         }
@@ -1723,7 +1723,7 @@ yyreduce:
     break;
 
   case 15: /* FuncDecl: FUNC IDENTIFIER LPAR OptFuncParams RPAR OptType FuncBody  */
-#line 226 "gocompiler (1).y"
+#line 226 "gocompiler.y"
                         {
                             (yyval.node) = new_node(FuncDecl, NULL);
                             
@@ -1741,7 +1741,7 @@ yyreduce:
     break;
 
   case 16: /* OptFuncParams: FuncParams  */
-#line 242 "gocompiler (1).y"
+#line 242 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[0].node);
                         }
@@ -1749,7 +1749,7 @@ yyreduce:
     break;
 
   case 17: /* OptFuncParams: %empty  */
-#line 246 "gocompiler (1).y"
+#line 246 "gocompiler.y"
                         {
                             (yyval.node) = new_node(FuncParams, NULL);
                         }
@@ -1757,7 +1757,7 @@ yyreduce:
     break;
 
   case 18: /* OptType: Type  */
-#line 252 "gocompiler (1).y"
+#line 252 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[0].node);
                         }
@@ -1765,7 +1765,7 @@ yyreduce:
     break;
 
   case 19: /* OptType: %empty  */
-#line 256 "gocompiler (1).y"
+#line 256 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -1773,7 +1773,7 @@ yyreduce:
     break;
 
   case 20: /* FuncParams: IDENTIFIER Type  */
-#line 266 "gocompiler (1).y"
+#line 266 "gocompiler.y"
                         {
                             (yyval.node) = new_node(FuncParams, NULL);
 
@@ -1788,7 +1788,7 @@ yyreduce:
     break;
 
   case 21: /* FuncParams: FuncParams COMMA IDENTIFIER Type  */
-#line 277 "gocompiler (1).y"
+#line 277 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-3].node);
                             
@@ -1803,7 +1803,7 @@ yyreduce:
     break;
 
   case 22: /* FuncBody: LBRACE VarsAndStatements RBRACE  */
-#line 294 "gocompiler (1).y"
+#line 294 "gocompiler.y"
                         {
                             (yyval.node) = new_node(FuncBody, NULL);
                             add_child((yyval.node), (yyvsp[-1].node));
@@ -1812,7 +1812,7 @@ yyreduce:
     break;
 
   case 23: /* VarsAndStatements: VarsAndStatements SEMICOLON  */
-#line 301 "gocompiler (1).y"
+#line 301 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-1].node);
                         }
@@ -1820,7 +1820,7 @@ yyreduce:
     break;
 
   case 24: /* VarsAndStatements: VarsAndStatements VarDecl SEMICOLON  */
-#line 305 "gocompiler (1).y"
+#line 305 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-2].node);
                             add_child((yyval.node), (yyvsp[-1].node));
@@ -1829,7 +1829,7 @@ yyreduce:
     break;
 
   case 25: /* VarsAndStatements: VarsAndStatements Statement SEMICOLON  */
-#line 310 "gocompiler (1).y"
+#line 310 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-2].node);
                             add_child((yyval.node), (yyvsp[-1].node));
@@ -1838,7 +1838,7 @@ yyreduce:
     break;
 
   case 26: /* VarsAndStatements: %empty  */
-#line 315 "gocompiler (1).y"
+#line 315 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -1846,7 +1846,7 @@ yyreduce:
     break;
 
   case 27: /* Statement: IDENTIFIER ASSIGN Expr  */
-#line 345 "gocompiler (1).y"
+#line 345 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Assign, NULL);
                             add_child((yyval.node), new_node(Identifier, (yyvsp[-2].lexeme)));
@@ -1859,7 +1859,7 @@ yyreduce:
     break;
 
   case 28: /* Statement: LBRACE StarStatementSc RBRACE  */
-#line 354 "gocompiler (1).y"
+#line 354 "gocompiler.y"
                         {
                             if(block_elements((yyvsp[-1].node)) > 1){
                                 (yyval.node) = new_node(Block, NULL);
@@ -1873,7 +1873,7 @@ yyreduce:
     break;
 
   case 29: /* Statement: IF Expr LBRACE StarStatementSc RBRACE OptElse  */
-#line 364 "gocompiler (1).y"
+#line 364 "gocompiler.y"
                         {
                             (yyval.node) = new_node(If, NULL);
                             struct node* if_block = new_node(Block, NULL);
@@ -1890,7 +1890,7 @@ yyreduce:
     break;
 
   case 30: /* Statement: FOR OptExpr LBRACE StarStatementSc RBRACE  */
-#line 377 "gocompiler (1).y"
+#line 377 "gocompiler.y"
                         {
                             (yyval.node) = new_node(For, NULL);
                             add_child((yyval.node), (yyvsp[-3].node));
@@ -1902,7 +1902,7 @@ yyreduce:
     break;
 
   case 31: /* Statement: RETURN OptExpr  */
-#line 385 "gocompiler (1).y"
+#line 385 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Return, NULL);
                             add_child((yyval.node), (yyvsp[0].node));
@@ -1913,7 +1913,7 @@ yyreduce:
     break;
 
   case 32: /* Statement: FuncInvocation  */
-#line 392 "gocompiler (1).y"
+#line 392 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[0].node);
                         }
@@ -1921,7 +1921,7 @@ yyreduce:
     break;
 
   case 33: /* Statement: ParseArgs  */
-#line 396 "gocompiler (1).y"
+#line 396 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[0].node);
                         }
@@ -1929,7 +1929,7 @@ yyreduce:
     break;
 
   case 34: /* Statement: PRINT LPAR Expr RPAR  */
-#line 400 "gocompiler (1).y"
+#line 400 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Print, NULL);
 
@@ -1940,7 +1940,7 @@ yyreduce:
     break;
 
   case 35: /* Statement: PRINT LPAR STRLIT RPAR  */
-#line 407 "gocompiler (1).y"
+#line 407 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Print, NULL);
                             add_child((yyval.node), new_node(StrLit, (yyvsp[-1].lexeme)));
@@ -1949,7 +1949,7 @@ yyreduce:
     break;
 
   case 36: /* Statement: error  */
-#line 412 "gocompiler (1).y"
+#line 412 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -1957,7 +1957,7 @@ yyreduce:
     break;
 
   case 37: /* StarStatementSc: StarStatementSc Statement SEMICOLON  */
-#line 418 "gocompiler (1).y"
+#line 418 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-2].node);
                             add_child((yyval.node), (yyvsp[-1].node));
@@ -1966,7 +1966,7 @@ yyreduce:
     break;
 
   case 38: /* StarStatementSc: %empty  */
-#line 423 "gocompiler (1).y"
+#line 423 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -1974,7 +1974,7 @@ yyreduce:
     break;
 
   case 39: /* OptElse: ELSE LBRACE StarStatementSc RBRACE  */
-#line 429 "gocompiler (1).y"
+#line 429 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-1].node);
                         }
@@ -1982,7 +1982,7 @@ yyreduce:
     break;
 
   case 40: /* OptElse: %empty  */
-#line 433 "gocompiler (1).y"
+#line 433 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -1990,7 +1990,7 @@ yyreduce:
     break;
 
   case 41: /* OptExpr: Expr  */
-#line 439 "gocompiler (1).y"
+#line 439 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[0].node);
                         }
@@ -1998,7 +1998,7 @@ yyreduce:
     break;
 
   case 42: /* OptExpr: %empty  */
-#line 443 "gocompiler (1).y"
+#line 443 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -2006,7 +2006,7 @@ yyreduce:
     break;
 
   case 43: /* ParseArgs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR  */
-#line 449 "gocompiler (1).y"
+#line 449 "gocompiler.y"
                         {
                             (yyval.node) = new_node(ParseArgs, NULL);
                             add_child((yyval.node), new_node(Identifier, (yyvsp[-10].lexeme)));
@@ -2018,7 +2018,7 @@ yyreduce:
     break;
 
   case 44: /* ParseArgs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR  */
-#line 457 "gocompiler (1).y"
+#line 457 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -2026,7 +2026,7 @@ yyreduce:
     break;
 
   case 45: /* FuncInvocation: IDENTIFIER LPAR PosExpr RPAR  */
-#line 463 "gocompiler (1).y"
+#line 463 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Call, NULL);
                             add_child((yyval.node), new_node(Identifier, (yyvsp[-3].lexeme)));
@@ -2040,7 +2040,7 @@ yyreduce:
     break;
 
   case 46: /* FuncInvocation: IDENTIFIER LPAR error RPAR  */
-#line 473 "gocompiler (1).y"
+#line 473 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -2048,7 +2048,7 @@ yyreduce:
     break;
 
   case 47: /* PosExpr: Expr  */
-#line 479 "gocompiler (1).y"
+#line 479 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                             add_child((yyval.node), (yyvsp[0].node));
@@ -2057,7 +2057,7 @@ yyreduce:
     break;
 
   case 48: /* PosExpr: Expr COMMA PosExpr  */
-#line 484 "gocompiler (1).y"
+#line 484 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2067,7 +2067,7 @@ yyreduce:
     break;
 
   case 49: /* PosExpr: %empty  */
-#line 490 "gocompiler (1).y"
+#line 490 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -2075,7 +2075,7 @@ yyreduce:
     break;
 
   case 50: /* Expr: Expr OR Expr  */
-#line 496 "gocompiler (1).y"
+#line 496 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Or, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2086,7 +2086,7 @@ yyreduce:
     break;
 
   case 51: /* Expr: Expr AND Expr  */
-#line 503 "gocompiler (1).y"
+#line 503 "gocompiler.y"
                         {
                             (yyval.node) = new_node(And, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2097,7 +2097,7 @@ yyreduce:
     break;
 
   case 52: /* Expr: Expr LT Expr  */
-#line 511 "gocompiler (1).y"
+#line 511 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Lt, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2108,7 +2108,7 @@ yyreduce:
     break;
 
   case 53: /* Expr: Expr GT Expr  */
-#line 518 "gocompiler (1).y"
+#line 518 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Gt, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2119,7 +2119,7 @@ yyreduce:
     break;
 
   case 54: /* Expr: Expr EQ Expr  */
-#line 525 "gocompiler (1).y"
+#line 525 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Eq, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2130,7 +2130,7 @@ yyreduce:
     break;
 
   case 55: /* Expr: Expr NE Expr  */
-#line 532 "gocompiler (1).y"
+#line 532 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Ne, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2141,7 +2141,7 @@ yyreduce:
     break;
 
   case 56: /* Expr: Expr LE Expr  */
-#line 539 "gocompiler (1).y"
+#line 539 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Le, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2152,7 +2152,7 @@ yyreduce:
     break;
 
   case 57: /* Expr: Expr GE Expr  */
-#line 546 "gocompiler (1).y"
+#line 546 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Ge, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2163,7 +2163,7 @@ yyreduce:
     break;
 
   case 58: /* Expr: Expr PLUS Expr  */
-#line 554 "gocompiler (1).y"
+#line 554 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Add, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2174,7 +2174,7 @@ yyreduce:
     break;
 
   case 59: /* Expr: Expr MINUS Expr  */
-#line 561 "gocompiler (1).y"
+#line 561 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Sub, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2185,7 +2185,7 @@ yyreduce:
     break;
 
   case 60: /* Expr: Expr STAR Expr  */
-#line 568 "gocompiler (1).y"
+#line 568 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Mul, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2196,7 +2196,7 @@ yyreduce:
     break;
 
   case 61: /* Expr: Expr DIV Expr  */
-#line 575 "gocompiler (1).y"
+#line 575 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Div, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2207,7 +2207,7 @@ yyreduce:
     break;
 
   case 62: /* Expr: Expr MOD Expr  */
-#line 582 "gocompiler (1).y"
+#line 582 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Mod, NULL);
                             add_child((yyval.node), (yyvsp[-2].node));
@@ -2218,7 +2218,7 @@ yyreduce:
     break;
 
   case 63: /* Expr: MINUS Expr  */
-#line 590 "gocompiler (1).y"
+#line 590 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Minus, NULL);
                             add_child((yyval.node), (yyvsp[0].node));
@@ -2228,7 +2228,7 @@ yyreduce:
     break;
 
   case 64: /* Expr: NOT Expr  */
-#line 596 "gocompiler (1).y"
+#line 596 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Not, NULL);
                             add_child((yyval.node), (yyvsp[0].node));
@@ -2238,7 +2238,7 @@ yyreduce:
     break;
 
   case 65: /* Expr: PLUS Expr  */
-#line 602 "gocompiler (1).y"
+#line 602 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Plus, NULL);
                             add_child((yyval.node), (yyvsp[0].node));
@@ -2248,7 +2248,7 @@ yyreduce:
     break;
 
   case 66: /* Expr: NATURAL  */
-#line 608 "gocompiler (1).y"
+#line 608 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Natural, (yyvsp[0].lexeme));
                             LOCATE((yyval.node), (yylsp[0]).first_line, (yylsp[0]).first_column);
@@ -2257,7 +2257,7 @@ yyreduce:
     break;
 
   case 67: /* Expr: DECIMAL  */
-#line 613 "gocompiler (1).y"
+#line 613 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Decimal, (yyvsp[0].lexeme));
                             LOCATE((yyval.node), (yylsp[0]).first_line, (yylsp[0]).first_column);
@@ -2266,7 +2266,7 @@ yyreduce:
     break;
 
   case 68: /* Expr: IDENTIFIER  */
-#line 618 "gocompiler (1).y"
+#line 618 "gocompiler.y"
                         {
                             (yyval.node) = new_node(Identifier, (yyvsp[0].lexeme));
 
@@ -2276,7 +2276,7 @@ yyreduce:
     break;
 
   case 69: /* Expr: FuncInvocation  */
-#line 624 "gocompiler (1).y"
+#line 624 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[0].node);
                             LOCATE((yyval.node), (yylsp[0]).first_line, (yylsp[0]).first_column);
@@ -2285,7 +2285,7 @@ yyreduce:
     break;
 
   case 70: /* Expr: LPAR Expr RPAR  */
-#line 629 "gocompiler (1).y"
+#line 629 "gocompiler.y"
                         {
                             (yyval.node) = (yyvsp[-1].node);
                             
@@ -2294,7 +2294,7 @@ yyreduce:
     break;
 
   case 71: /* Expr: LPAR error RPAR  */
-#line 634 "gocompiler (1).y"
+#line 634 "gocompiler.y"
                         {
                             (yyval.node) = new_node(AUX, NULL);
                         }
@@ -2500,7 +2500,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 642 "gocompiler (1).y"
+#line 642 "gocompiler.y"
 
 
 // all needed functions are collected in the .l and ast.* files

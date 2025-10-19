@@ -1,5 +1,12 @@
 %{
+    /*
+    Projeto de Compiladores 2023/2024~
+    Meta 2
+    2021189478 - Rui Ribeiro
+    2021221169 - Francisco Rodrigues
+    */
     //gocompiler_v4 teste de substituicao dos comments - resultado correu bem apenas 0 erros agora - corrigido tirar i_semi dos comentarios
+    
     int line = 1;
     int comment_lines = 1; 
     int col = 0;
@@ -31,7 +38,8 @@ newline \n|(\r\n)
 sp_chr  \\(\"|n|r|t|f|\\)
 whispace (" "|\t)
 
-%X SINGLE_LINE_COMMENT MULTI_LINE_COMMENT STRING
+%X SEMICOLON BCOMMENT LCOMMENT STRING DUMMY_QUOTE OCTAL SEMIBCOMMENT SEMILCOMMENT INVALID_STRING SEMICOLON2
+
 %%
 
 ";"				{if (flag_1) if(i_semicolon==0){fprintf(yyout, "SEMICOLON\n");}if(i_semicolon==1){fprintf(yyout, "SEMICOLON\n");i_semicolon=0;} col+=yyleng; }
@@ -72,8 +80,8 @@ whispace (" "|\t)
 "strconv.Atoi"	{if (flag_1) fprintf(yyout, "PARSEINT\n"); col+=yyleng; i_semicolon=0;}
 "func"			{if (flag_1) fprintf(yyout, "FUNC\n"); col+=yyleng; i_semicolon=0;}
 "os.Args"		{if (flag_1) fprintf(yyout, "CMDARGS\n"); col+=yyleng; i_semicolon=0;}
-"/*"			{col++; comment_lines = 0; comment_cols = 0; swaped_line = 0; BEGIN MULTI_LINE_COMMENT;}
-"//"			{col++; BEGIN SINGLE_LINE_COMMENT;}
+"/*"			{col++; comment_lines = 0; comment_cols = 0; swaped_line = 0; BEGIN BCOMMENT;}
+"//"			{col++; BEGIN LCOMMENT;}
 
 "++"|"--"		{if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
 "break"         {if (flag_1) fprintf(yyout, "RESERVED(%s)\n", yytext); col+=yyleng; i_semicolon=0;}
@@ -103,46 +111,48 @@ whispace (" "|\t)
 {letter}[a-zA-Z0-9_]*			{if (flag_1) fprintf(yyout, "IDENTIFIER(%s)\n", yytext); col+=yyleng; i_semicolon=1;}
 \"                              {yyless(0); BEGIN STRING;}
 
-"//"                                { BEGIN(SINGLE_LINE_COMMENT); }
-<SINGLE_LINE_COMMENT><<EOF>>        { fprintf(yyout, "Line %d, column %d: unterminated comment\n", line, col); BEGIN(INITIAL); i_semicolon = 0;}
-<SINGLE_LINE_COMMENT>{newline}      { BEGIN(INITIAL); if(i_semicolon && flag_1) fprintf(yyout, "SEMICOLON\n"); i_semicolon = 0;line++; col = 1; }
-<SINGLE_LINE_COMMENT>.              { ; }
 
-"/*"                                { BEGIN(MULTI_LINE_COMMENT); ml_comment_start_line = line;ml_comment_start_col = col;}
-<MULTI_LINE_COMMENT><<EOF>>         { fprintf(yyout, "Line %d, column %d: unterminated comment\n", ml_comment_start_line, ml_comment_start_col); BEGIN(INITIAL); i_semicolon = 0;}
-<MULTI_LINE_COMMENT>"*/"            { BEGIN(INITIAL); }
-<MULTI_LINE_COMMENT>{newline}       { line++; col = 1; }
-<MULTI_LINE_COMMENT>.               { ; }
 
-\" { BEGIN(STRING); reset_str_buffer();str_error = 0;str_start_line = line;str_start_col = col;i_semicolon = 1;}// Assume que vai ser válida inicialmente
+<BCOMMENT>"*/" 	        				  {line+=comment_lines; if (swaped_line) col = 0; else col++; col+=comment_cols+yyleng; BEGIN 0;}
+<BCOMMENT>{newline}        	              {comment_lines++; comment_cols = 0; swaped_line = 1;}
+<BCOMMENT><<EOF>>                         {fprintf(yyout, "Line %d, column %d: unterminated comment\n", line, col); yyterminate();}
+<BCOMMENT>.     	        	          {comment_cols+=yyleng;}
 
-<STRING><<EOF>> { fprintf(yyout, "Line %d, column %d: unterminated string literal\n", str_start_line, str_start_col);  BEGIN(INITIAL); i_semicolon = 0;} // ERRO: sem SEMICOLON
+<LCOMMENT>{newline} 	        		  {if(flag_1 && i_semicolon==1) fprintf(yyout, "SEMICOLON\n");i_semicolon=0;line++; col = 0; BEGIN 0;}
+<LCOMMENT>. 	        				  {;}
 
-<STRING>\n {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", str_start_line, str_start_col);line++;col = 1;BEGIN(INITIAL);i_semicolon = 0;} // ERRO: sem SEMICOLON
+<SEMICOLON>{newline}                      {if (flag_1) fprintf(yyout, "SEMICOLON\n");line++; col = 0; BEGIN 0;}
+<SEMICOLON>{whispace}	                  {col+=yyleng;}
+<SEMICOLON>"/*"                           {col++; comment_lines = 0; comment_cols = 0; swaped_line = 0; BEGIN SEMIBCOMMENT;}
+<SEMICOLON>"//"                           {BEGIN SEMILCOMMENT;}
+<SEMICOLON>.                              {yyless(0); BEGIN 0;}
+<SEMICOLON><<EOF>>                        {if (flag_1) fprintf(yyout, "SEMICOLON\n"); yyterminate();}
 
-<STRING>\\[nrtf\\\"] {if (str_buffer_index < 4095) {str_buffer[str_buffer_index++] = yytext[0];str_buffer[str_buffer_index++] = yytext[1];}}
 
-<STRING>\\[^nrtf\\\"] {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col, yytext);str_error = 1;i_semicolon = 0;  } // Escape inválido // ERRO: sem SEMICOLON
 
-<STRING>\" {
-    str_buffer[str_buffer_index] = '\0';
-    if (!str_error && flag_1) {
-        fprintf(yyout, "STRLIT(%s)\n", str_buffer);
-        i_semicolon = 1;
-    } else {
-        i_semicolon = 0;
-    }
-    BEGIN(INITIAL);
-}// Fim da string // VÁLIDA: com SEMICOLON // TEVE ERROS: sem SEMICOLON
+<SEMIBCOMMENT>"*/" 	        				  {line+=comment_lines; if (swaped_line) col = 0; else col++; col+=comment_cols+yyleng; if (swaped_line) {fprintf(yyout, "SEMICOLON\n"); BEGIN 0;} else BEGIN SEMICOLON;}
+<SEMIBCOMMENT>{newline}        	              {comment_lines++; comment_cols = 0; swaped_line=1; }
+<SEMIBCOMMENT><<EOF>>                         {fprintf(yyout, "SEMICOLON\n"); fprintf(yyout, "Line %d, column %d: unterminated comment\n", line, col); yyterminate();}
+<SEMIBCOMMENT>.     	        	          {comment_cols+=yyleng;}
 
-<STRING>[^\\\"\n]+ {
-    // Caracteres normais - adiciona ao buffer
-    int len = yyleng;
-    if (str_buffer_index + len < 4095) {
-        strncpy(&str_buffer[str_buffer_index], yytext, len);
-        str_buffer_index += len;
-    }
-}
+<SEMILCOMMENT>{newline} 	        		  {yyless(0); BEGIN SEMICOLON;}
+<SEMILCOMMENT><<EOF>>                         {fprintf(yyout, "SEMICOLON\n"); yyterminate();}
+<SEMILCOMMENT>. 	        				  {;}
+
+<STRING>{newline}                                               {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;}// ← CORREÇÃO: resetar flag
+<STRING>\"(\\(\"|n|r|t|f|\\)|[^\\\"\r\n])*\"                    {if (flag_1) fprintf(yyout, "STRLIT(%s)\n", yytext); col+=yyleng; BEGIN SEMICOLON;}
+<STRING>\"[^\"\r\n]*\\[^\\\"nrtf][^\"\r\n]*\"                   {yyless(0); BEGIN DUMMY_QUOTE;}
+<STRING>\"[^\"\r\n]*{newline}?                                  {yyless(0); BEGIN DUMMY_QUOTE;}
+
+<DUMMY_QUOTE>\"                            {col++; comment_cols = 1; BEGIN INVALID_STRING;}
+
+<INVALID_STRING>\"                          {col+=comment_cols; BEGIN 0;} // ← CORREÇÃO: resetar flag
+<INVALID_STRING>{newline}                   {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); line++; col = 0; BEGIN 0;} // ← CORREÇÃO: resetar flag
+<INVALID_STRING>\\(\"|n|r|t|f|\\)           {comment_cols+=yyleng;}
+<INVALID_STRING>\\[^\\\"nrtf\r\n]           {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
+<INVALID_STRING>\\                          {fprintf(yyout, "Line %d, column %d: invalid escape sequence (%s)\n", line, col+comment_cols, yytext); comment_cols+=yyleng;}
+<INVALID_STRING><<EOF>>                     {fprintf(yyout, "Line %d, column %d: unterminated string literal\n", line, col); yyterminate(); }
+<INVALID_STRING>.                           {comment_cols+=yyleng; }
 
 
 {newline}				    			  {line++; col = 0;if(i_semicolon == 1 && start_brace == 0)fprintf(yyout, "SEMICOLON\n"); i_semicolon=0;start_brace=0;BEGIN 0;}
