@@ -1,0 +1,5 @@
+Line 7, column 24: syntax error: fmt.Println
+Line 8, column 32: syntax error: "OS"
+Line 9, column 31: syntax error: (
+Line 10, column 31: syntax error: )
+Line 11, column 38: syntax error: strconv.Atoi
