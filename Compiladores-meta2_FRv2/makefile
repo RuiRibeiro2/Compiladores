@@ -1,26 +1,30 @@
-# Makefile para compilar o gocompiler
+CC=gcc
+CFLAGS=-Wall -g
+LEX=flex
+YACC=bison -d -y
 
-# Variáveis
-CC = gcc
-FLEX = flex
-BISON = bison
-CFLAGS = -Wall -g
+SOURCES=lex.yy.c y.tab.c ast.c semantics.c
+OBJECTS=$(SOURCES:.c=.o)
+EXECUTABLE=gocompiler
 
-# Arquivos
-TARGET = gocompiler
-LEX_FILE = gocompiler.l
-YACC_FILE = gocompiler.y
-AST_FILES = ast.c ast.h
+all: $(EXECUTABLE)
 
-# Regra padrão
-$(TARGET): lex.yy.c y.tab.c $(AST_FILES)
-	$(CC) $(CFLAGS) lex.yy.c y.tab.c ast.c -o $(TARGET)
+$(EXECUTABLE): lex.yy.c y.tab.c ast.o semantics.o
+	$(CC) $(CFLAGS) lex.yy.c y.tab.c ast.c semantics.c -o $(EXECUTABLE)
 
-lex.yy.c: $(LEX_FILE)
-	$(FLEX) $(LEX_FILE)
+lex.yy.c: gocompiler.l
+	$(LEX) gocompiler.l
 
-y.tab.c: $(YACC_FILE)
-	$(BISON) -d -y $(YACC_FILE)
+y.tab.c y.tab.h: gocompiler.y
+	$(YACC) gocompiler.y
+
+ast.o: ast.c ast.h
+	$(CC) $(CFLAGS) -c ast.c
+
+semantics.o: semantics.c semantics.h ast.h
+	$(CC) $(CFLAGS) -c semantics.c
 
 clean:
-	rm -f $(TARGET) lex.yy.c y.tab.c y.tab.h
+	rm -f gocompiler lex.yy.c y.tab.c y.tab.h *.o
+
+.PHONY: all clean

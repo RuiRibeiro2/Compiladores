@@ -4,10 +4,9 @@
     int comment_lines = 1; 
     int col = 0;
     int comment_cols = 0;
-    int flag_1, swaped_line;
+    int flag_1 = 0, swaped_line;
     int i_semicolon = 0;
     int start_brace = 0;
-
 
     #include <ctype.h>
     #include <stdio.h>
@@ -15,6 +14,10 @@
     #include <stdlib.h>
 
     #include "ast.h"
+    #include "semantics.h"
+
+    /* variável partilhada que o parser usa para sinalizar erros de sintaxe */
+    int synerr = 0;
 
     int yyparse(void);
 
@@ -23,7 +26,6 @@
     extern int yylex(void);
     extern int yylineno;
     extern char *yytext;
-    extern int line, column;
     extern struct node *root;
 
 
@@ -173,14 +175,28 @@ whispace (" "|\t)
 
 
 int main(int argc, char **argv) {
-    if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't') {
-        flag = 't';
+    int i;
+    /* aceitar -l e -t em qualquer posição (mais robusto) */
+    for (i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (strchr(argv[i], 'l')) flag_1 = 1;
+            if (strchr(argv[i], 't')) flag = 't';
+            if (strchr(argv[i], 's')) flag = 's'; /* opcional: manter compatibilidade */
+        }
     }
 
-    yyparse(); // <<<<< sempre chama o parser
+    /* sempre chama o parser (constrói a AST em 'root') */
+    yyparse();
 
-    if (flag == 't') {
-        dfs(root, 0); // <<<<< só imprime a árvore se for -t
+    /* só imprime a árvore se foi pedido -t e não houve erros de sintaxe */
+    if (flag == 't' && synerr == 0) {
+        dfs(root, 0);
+    }
+
+    /* se não for pedido -t e não houve erro sintático, executar análise semântica */
+    if (flag != 't' && synerr == 0) {
+        int serrs = check_program(root);
+        (void)serrs; /* serrs já imprime mensagens */
     }
 
     return 0;

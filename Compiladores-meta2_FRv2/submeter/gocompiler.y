@@ -15,6 +15,9 @@ void yyerror(const char *s);
 
 struct node *root = NULL;
 extern char flag;
+
+/* novo: variável partilhada que indica se houve erro de sintaxe */
+extern int synerr;
 %}
 
 %union {
@@ -302,6 +305,9 @@ expr:
 
 %%
 
+
 void yyerror(const char *s) {
+    /* marca que houve erro de sintaxe e imprime a mensagem */
+    synerr = 1;
     printf("Line %d, column %d: syntax error: %s\n", line, col, yytext);
 }

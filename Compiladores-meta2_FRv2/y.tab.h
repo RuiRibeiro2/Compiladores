@@ -39,7 +39,7 @@
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -54,50 +54,49 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    SEMICOLON = 258,               /* SEMICOLON  */
-    COMMA = 259,                   /* COMMA  */
-    STAR = 260,                    /* STAR  */
-    DIV = 261,                     /* DIV  */
-    MINUS = 262,                   /* MINUS  */
-    PLUS = 263,                    /* PLUS  */
-    EQ = 264,                      /* EQ  */
-    GE = 265,                      /* GE  */
-    GT = 266,                      /* GT  */
-    LBRACE = 267,                  /* LBRACE  */
-    LE = 268,                      /* LE  */
-    LPAR = 269,                    /* LPAR  */
-    LSQ = 270,                     /* LSQ  */
-    LT = 271,                      /* LT  */
-    MOD = 272,                     /* MOD  */
-    NE = 273,                      /* NE  */
-    NOT = 274,                     /* NOT  */
-    AND = 275,                     /* AND  */
-    OR = 276,                      /* OR  */
-    PACKAGE = 277,                 /* PACKAGE  */
-    ELSE = 278,                    /* ELSE  */
-    FOR = 279,                     /* FOR  */
-    IF = 280,                      /* IF  */
-    VAR = 281,                     /* VAR  */
-    INT = 282,                     /* INT  */
-    FLOAT32 = 283,                 /* FLOAT32  */
-    BOOL = 284,                    /* BOOL  */
-    STRING = 285,                  /* STRING  */
-    PRINT = 286,                   /* PRINT  */
-    PARSEINT = 287,                /* PARSEINT  */
-    FUNC = 288,                    /* FUNC  */
-    CMDARGS = 289,                 /* CMDARGS  */
-    BLANKID = 290,                 /* BLANKID  */
-    RBRACE = 291,                  /* RBRACE  */
-    RPAR = 292,                    /* RPAR  */
-    RETURN = 293,                  /* RETURN  */
+    PACKAGE = 258,                 /* PACKAGE  */
+    RETURN = 259,                  /* RETURN  */
+    ELSE = 260,                    /* ELSE  */
+    FOR = 261,                     /* FOR  */
+    IF = 262,                      /* IF  */
+    VAR = 263,                     /* VAR  */
+    INT = 264,                     /* INT  */
+    FLOAT32 = 265,                 /* FLOAT32  */
+    BOOL = 266,                    /* BOOL  */
+    STRING = 267,                  /* STRING  */
+    FUNC = 268,                    /* FUNC  */
+    CMDARGS = 269,                 /* CMDARGS  */
+    PRINT = 270,                   /* PRINT  */
+    PARSEINT = 271,                /* PARSEINT  */
+    SEMICOLON = 272,               /* SEMICOLON  */
+    COMMA = 273,                   /* COMMA  */
+    BLANKID = 274,                 /* BLANKID  */
+    ASSIGN = 275,                  /* ASSIGN  */
+    STAR = 276,                    /* STAR  */
+    DIV = 277,                     /* DIV  */
+    MINUS = 278,                   /* MINUS  */
+    PLUS = 279,                    /* PLUS  */
+    EQ = 280,                      /* EQ  */
+    GE = 281,                      /* GE  */
+    GT = 282,                      /* GT  */
+    LE = 283,                      /* LE  */
+    LPAR = 284,                    /* LPAR  */
+    LSQ = 285,                     /* LSQ  */
+    LT = 286,                      /* LT  */
+    MOD = 287,                     /* MOD  */
+    NE = 288,                      /* NE  */
+    NOT = 289,                     /* NOT  */
+    AND = 290,                     /* AND  */
+    OR = 291,                      /* OR  */
+    RBRACE = 292,                  /* RBRACE  */
+    RPAR = 293,                    /* RPAR  */
     RSQ = 294,                     /* RSQ  */
-    ASSIGN = 295,                  /* ASSIGN  */
-    STRLIT = 296,                  /* STRLIT  */
-    RESERVED = 297,                /* RESERVED  */
-    IDENTIFIER = 298,              /* IDENTIFIER  */
-    NATURAL = 299,                 /* NATURAL  */
-    DECIMAL = 300,                 /* DECIMAL  */
-    LOW = 301                      /* LOW  */
+    LBRACE = 295,                  /* LBRACE  */
+    IDENTIFIER = 296,              /* IDENTIFIER  */
+    STRLIT = 297,                  /* STRLIT  */
+    NATURAL = 298,                 /* NATURAL  */
+    DECIMAL = 299,                 /* DECIMAL  */
+    UMINUS = 300                   /* UMINUS  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -106,61 +105,60 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define SEMICOLON 258
-#define COMMA 259
-#define STAR 260
-#define DIV 261
-#define MINUS 262
-#define PLUS 263
-#define EQ 264
-#define GE 265
-#define GT 266
-#define LBRACE 267
-#define LE 268
-#define LPAR 269
-#define LSQ 270
-#define LT 271
-#define MOD 272
-#define NE 273
-#define NOT 274
-#define AND 275
-#define OR 276
-#define PACKAGE 277
-#define ELSE 278
-#define FOR 279
-#define IF 280
-#define VAR 281
-#define INT 282
-#define FLOAT32 283
-#define BOOL 284
-#define STRING 285
-#define PRINT 286
-#define PARSEINT 287
-#define FUNC 288
-#define CMDARGS 289
-#define BLANKID 290
-#define RBRACE 291
-#define RPAR 292
-#define RETURN 293
+#define PACKAGE 258
+#define RETURN 259
+#define ELSE 260
+#define FOR 261
+#define IF 262
+#define VAR 263
+#define INT 264
+#define FLOAT32 265
+#define BOOL 266
+#define STRING 267
+#define FUNC 268
+#define CMDARGS 269
+#define PRINT 270
+#define PARSEINT 271
+#define SEMICOLON 272
+#define COMMA 273
+#define BLANKID 274
+#define ASSIGN 275
+#define STAR 276
+#define DIV 277
+#define MINUS 278
+#define PLUS 279
+#define EQ 280
+#define GE 281
+#define GT 282
+#define LE 283
+#define LPAR 284
+#define LSQ 285
+#define LT 286
+#define MOD 287
+#define NE 288
+#define NOT 289
+#define AND 290
+#define OR 291
+#define RBRACE 292
+#define RPAR 293
 #define RSQ 294
-#define ASSIGN 295
-#define STRLIT 296
-#define RESERVED 297
-#define IDENTIFIER 298
-#define NATURAL 299
-#define DECIMAL 300
-#define LOW 301
+#define LBRACE 295
+#define IDENTIFIER 296
+#define STRLIT 297
+#define NATURAL 298
+#define DECIMAL 299
+#define UMINUS 300
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 20 "gocompiler_nuno_m2.y"
+#line 20 "gocompiler.y"
 
-    char *lexeme;
-    struct node *node;
+    char* str;
+    struct node* node;
 
-#line 164 "y.tab.h"
+#line 162 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

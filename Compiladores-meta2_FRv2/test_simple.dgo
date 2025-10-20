@@ -1,0 +1,18 @@
+package main;
+
+var x int;
+var y int;
+var x float32;
+
+func test(a int, b int) int {
+    var local int;
+    return a;
+};
+
+func test(c int) int {
+    return c;
+};
+
+func main() {
+    var z bool;
+};
